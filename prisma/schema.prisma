@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String?
+  password        String   // Added for NextAuth credentials
+  avatar          String?
+  totalScore      Int      @default(0)
+  quizzesTaken    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  quizzes         Quiz[]
+}
+
+model Quiz {
+  id           String   @id @default(cuid())
+  userId       String
+  score        Int
+  total        Int
+  percentage   Int
+  mode         String   // "practice" | "test"
+  difficulty   String   // "easy" | "medium" | "hard" | "mixed"
+  createdAt    DateTime @default(now())
+  
+  // Storing the JSON stringIFIED list of weak topics extracted from this quiz
+  weakTopics   String?  @default("[]")
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
