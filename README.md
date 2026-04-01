@@ -1,6 +1,13 @@
 # Quizzify AI
 
-Quizzify AI is a modern SaaS platform that leverages Google Generative AI (Gemini) to instantly convert uploaded documents and PDFs into interactive, dynamic quizzes. Built with Next.js, React, and PostgreSQL, the platform allows users to assess their knowledge, track performance across practice and test modes, and compete on a global leaderboard.
+<br/>
+<div align="center">
+  <b>The fastest way to master any subject.</b><br/>
+  Transform any PDF into an interactive, competitive assessment in seconds using Gemini AI.
+</div>
+<br/>
+
+Quizzify AI is a production-ready SaaS platform built with Next.js, React, and PostgreSQL. It leverages Google Generative AI to intelligently extract context from documents, instantly generating precision quizzes to track learning progress and fuel a global leaderboard.
 
 🌍 **Live Production URL:** [https://quizzify-ai.vercel.app](https://quizzify-ai.vercel.app)
 
