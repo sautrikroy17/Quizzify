@@ -23,15 +23,19 @@ export default async function TopNav() {
           </Link>
 
           {isLoggedIn && (
-            <div className="hidden md:flex items-center gap-1">
-              <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4" /> Dashboard
+            <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-[#09090b]/95 border-t border-white/5 py-3 px-2 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto md:flex md:justify-start md:bg-transparent md:border-none md:py-0 md:px-0 gap-1 mt-auto">
+              <Link href="/dashboard" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 px-2 md:px-4 py-2 text-xs md:text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5">
+                <LayoutDashboard className="w-5 h-5 md:w-4 md:h-4" /> <span className="hidden md:inline">Dashboard</span>
               </Link>
-              <Link href="/generate" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
-                <Zap className="w-4 h-4" /> Generate Quiz
+              <Link href="/generate" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 px-2 md:px-4 py-2 text-xs md:text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5">
+                <Zap className="w-5 h-5 md:w-4 md:h-4" /> <span className="hidden md:inline">Generate</span>
               </Link>
-              <Link href="/leaderboard" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
-                <Trophy className="w-4 h-4" /> Leaderboard
+              <Link href="/leaderboard" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 px-2 md:px-4 py-2 text-xs md:text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5">
+                <Trophy className="w-5 h-5 md:w-4 md:h-4" /> <span className="hidden md:inline">Leaderboard</span>
+              </Link>
+              {/* Profile icon in mobile nav explicitly for small screens since top right gets crowded */}
+              <Link href="/profile" className="flex flex-col md:hidden items-center gap-1 px-2 py-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5">
+                <User className="w-5 h-5 text-primary" /> <span>Profile</span>
               </Link>
             </div>
           )}

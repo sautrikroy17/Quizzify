@@ -59,7 +59,7 @@ export default function UploadBox({ file, loading, questionCount, difficulty, on
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
           <label className="block text-sm font-medium text-zinc-400 mb-2">Number of Questions</label>
           <div className="flex gap-2">
@@ -97,7 +97,7 @@ export default function UploadBox({ file, loading, questionCount, difficulty, on
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
-            <Loader2 className="w-5 h-5 animate-spin" /> Forging Knowledge...
+            <Loader2 className="w-5 h-5 animate-spin" /> Generating Knowledge...
           </span>
         ) : "Generate Quiz ✨"}
       </motion.button>
