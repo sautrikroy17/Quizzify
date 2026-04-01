@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="bg-[#09090b] overscroll-none">
+      <body className={`${inter.className} pb-20 md:pb-0`}>
         <TopNav />
         {children}
       </body>
