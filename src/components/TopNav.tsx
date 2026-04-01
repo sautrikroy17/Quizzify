@@ -27,8 +27,8 @@ export default async function TopNav() {
               <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
                 <LayoutDashboard className="w-4 h-4" /> Dashboard
               </Link>
-              <Link href="/forge" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
-                <Zap className="w-4 h-4" /> Forge Quiz
+              <Link href="/generate" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
+                <Zap className="w-4 h-4" /> Generate Quiz
               </Link>
               <Link href="/leaderboard" className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md hover:bg-white/5 flex items-center gap-2">
                 <Trophy className="w-4 h-4" /> Leaderboard

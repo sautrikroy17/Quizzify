@@ -73,7 +73,7 @@ export default async function ProfilePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
             <div className="text-3xl font-black text-white mb-1">{user.quizzesTaken}</div>
-            <div className="text-xs text-zinc-400 uppercase tracking-wider">Quizzes Forged</div>
+            <div className="text-xs text-zinc-400 uppercase tracking-wider">Quizzes Generated</div>
           </div>
           <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
             <div className="text-3xl font-black text-emerald-400 mb-1">{user.quizzesTaken > 0 ? Math.round(user.totalScore / Math.max(1, user.quizzesTaken)) : 0}</div>

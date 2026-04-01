@@ -15,7 +15,7 @@ interface Question {
   topic: string;
 }
 
-export default function ForgePage() {
+export default function GeneratePage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +150,7 @@ export default function ForgePage() {
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-white leading-tight"
           >
-            Forge a Custom Assessment
+            Generate a Custom Assessment
           </motion.h1>
         </header>
 
