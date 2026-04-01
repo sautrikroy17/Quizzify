@@ -18,7 +18,7 @@ export default async function LandingPage() {
           Master any subject.<br/>In seconds.
         </h1>
         <p className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto mb-12 font-medium">
-          Upload any PDF or document and let Quizzify AI craft intelligent assessments, track your weak spots, and push you up the leaderboard.
+          Upload any PDF or document and let Quizzify AI forge intelligent assessments, track your weak spots, and push you up the leaderboard.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

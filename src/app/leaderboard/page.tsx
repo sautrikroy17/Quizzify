@@ -37,7 +37,7 @@ export default async function LeaderboardPage() {
                 </td>
                 <td className="p-6">
                   <div className="font-semibold text-white">{user.name}</div>
-                  <div className="text-sm text-zinc-500">{user.quizzesTaken} Quizzes Generated</div>
+                  <div className="text-sm text-zinc-500">{user.quizzesTaken} Quizzes Forged</div>
                 </td>
                 <td className="p-6 text-right font-mono font-black text-primary text-xl">
                   {user.totalScore.toLocaleString()}

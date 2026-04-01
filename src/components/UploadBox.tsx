@@ -97,9 +97,9 @@ export default function UploadBox({ file, loading, questionCount, difficulty, on
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
-            <Loader2 className="w-5 h-5 animate-spin" /> Generating Knowledge...
+            <Loader2 className="w-5 h-5 animate-spin" /> Forging Knowledge...
           </span>
-        ) : "Generate Quiz ✨"}
+        ) : "Forge Quiz ✨"}
       </motion.button>
     </motion.div>
   );

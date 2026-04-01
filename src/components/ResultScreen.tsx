@@ -12,7 +12,7 @@ export default function ResultScreen({ score, total, onReset, weakTopics = [] }:
   const percentage = Math.round((score / total) * 100);
   
   // Dynamic messaging
-  let message = "You successfully conquered all questions.";
+  let message = "You successfully forged through all questions.";
   if (percentage >= 90) message = "Exceptional performance! Outstanding mastery.";
   else if (percentage >= 70) message = "Great job! You have a solid grasp of this.";
   else if (percentage < 50) message = "Keep studying! You'll master this soon.";
@@ -76,7 +76,7 @@ export default function ResultScreen({ score, total, onReset, weakTopics = [] }:
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent group-hover:-translate-x-full duration-[1.5s] ease-in-out translate-x-full" />
           <RotateCcw className="w-5 h-5 group-hover:-rotate-180 transition-transform duration-500" /> 
-          Create Another Quiz
+          Forge Another Quiz
         </button>
       </div>
     </motion.div>

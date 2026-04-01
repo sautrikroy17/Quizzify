@@ -41,8 +41,8 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {user.name}</h1>
           <p className="text-zinc-400">Here's your latest performance data.</p>
         </div>
-        <Link href="/generate" className="flex items-center gap-2 bg-gradient-brand hover:brightness-110 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(79,172,254,0.3)]">
-          <Zap className="w-5 h-5" /> Generate New Quiz
+        <Link href="/forge" className="flex items-center gap-2 bg-gradient-brand hover:brightness-110 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(79,172,254,0.3)]">
+          <Zap className="w-5 h-5" /> Forge New Quiz
         </Link>
       </div>
 
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="text-center py-10 text-zinc-500">
-            You haven't generated any quizzes yet.
+            You haven't forged any quizzes yet.
           </div>
         )}
       </div>
