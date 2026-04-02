@@ -32,6 +32,22 @@ export default function ForgePage() {
   const [quizFinished, setQuizFinished] = useState(false);
 
   const extractTextFromPdf = async (file: File): Promise<string> => {
+    // Polyfill ReadableStream async iteration for Safari < 16.4 which throws "undefined is not a function near '...t of e...'"
+    if (typeof ReadableStream !== 'undefined' && !(ReadableStream.prototype as any)[Symbol.asyncIterator]) {
+      (ReadableStream.prototype as any)[Symbol.asyncIterator] = async function* () {
+        const reader = this.getReader();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) return;
+            yield value;
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      };
+    }
+
     // We strictly use pdfjs-dist 3.11.174 which natively supports older platforms (Safari 14+)
     const pdfjsLib = await import('pdfjs-dist');
     pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
