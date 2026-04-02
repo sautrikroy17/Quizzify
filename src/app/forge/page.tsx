@@ -32,10 +32,9 @@ export default function ForgePage() {
   const [quizFinished, setQuizFinished] = useState(false);
 
   const extractTextFromPdf = async (file: File): Promise<string> => {
-    // We use the legacy build because modern pdfjs-dist drops support for older browsers
-    // (e.g., older Safari versions lacking Promise.withResolvers and other advanced ES features)
-    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/legacy/build/pdf.worker.min.mjs`;
+    // We strictly use pdfjs-dist 3.11.174 which natively supports older platforms (Safari 14+)
+    const pdfjsLib = await import('pdfjs-dist');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
 
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
