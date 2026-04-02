@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { validate as deepEmailValidate } from "deep-email-validator";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,20 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    // Authenticate Email deeply (blocks throwaway/disposable, fake domains, bad format)
+    const emailValidation = await deepEmailValidate({
+      email: email,
+      validateRegex: true,
+      validateMx: true,
+      validateTypo: true,
+      validateDisposable: true,
+      validateSMTP: false, // SMTP validation is notoriously unreliable in serverless environments
+    });
+
+    if (!emailValidation.valid && emailValidation.reason !== 'smtp') {
+      return NextResponse.json({ error: "Please provide a valid, real email address." }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
