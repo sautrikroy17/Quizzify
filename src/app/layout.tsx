@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Quizzify AI',
   description: 'Turn PDFs into interactive quizzes instantly.',
+  icons: {
+    icon: '/logo.png',
+  },
 }
 
 export default function RootLayout({

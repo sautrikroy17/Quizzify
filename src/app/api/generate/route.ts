@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/nextauth";
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized. Please log in to forge quizzes." }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const extractedText = formData.get("text") as string | null;
     const count = parseInt(formData.get("count") as string || "5", 10);
@@ -16,7 +23,7 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error("GEMINI_API_KEY environment variable is missing.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const difficultyInstruction = difficulty === "mixed" 
       ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)" 

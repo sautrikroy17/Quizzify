@@ -3,6 +3,14 @@ import { Trophy, Medal } from "lucide-react";
 
 export default async function LeaderboardPage() {
   const users = await prisma.user.findMany({
+    where: {
+      NOT: {
+        name: {
+          equals: 'chutia',
+          mode: 'insensitive'
+        }
+      }
+    },
     orderBy: { totalScore: 'desc' },
     take: 50
   });
