@@ -3,14 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/nextauth";
 
-// These models work on the v1beta endpoint (SDK default).
-// gemini-2.0-flash-lite has its own separate free tier quota from gemini-2.0-flash.
-const MODEL_FALLBACK_CHAIN = [
-  "gemini-2.0-flash-lite",
-  "gemini-2.0-flash",
-  "gemini-1.5-flash-8b",
-];
-
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -52,12 +44,13 @@ Output strictly as a raw JSON array of objects fulfilling this structure:
 Do not include any formatting, markdown wrappers, or extra text. ONLY return the JSON array.
 
 --- Source Text ---
-${extractedText.slice(0, 50000)}`;
+${extractedText.slice(0, 30000)}`;
 
-    let lastError: Error | null = null;
+    // Try models in order — all exist on v1beta (SDK default endpoint)
+    const models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"];
+    let lastError: any = null;
 
-    // Try each model in order until one succeeds
-    for (const modelName of MODEL_FALLBACK_CHAIN) {
+    for (const modelName of models) {
       try {
         const model = genAI.getGenerativeModel({ model: modelName });
         const result = await model.generateContent({
@@ -66,12 +59,9 @@ ${extractedText.slice(0, 50000)}`;
         const responseText = result.response.text();
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const questions = JSON.parse(cleanedText);
-
-        // Return with which model was used (helpful for debugging)
-        return NextResponse.json({ questions, model: modelName });
+        return NextResponse.json({ questions });
       } catch (err: any) {
         const msg = (err.message || "") + " " + String(err);
-        // 429 / quota exceeded / resource exhausted → try next model
         if (
           msg.includes("429") ||
           msg.includes("quota") ||
@@ -80,21 +70,15 @@ ${extractedText.slice(0, 50000)}`;
           msg.includes("rate limit")
         ) {
           lastError = err;
-          console.warn(`[Quizzify] Model ${modelName} quota exceeded — trying next model...`);
-          continue;
+          continue; // try next model
         }
-        // Any other error (auth, parse, etc.) — fail immediately
-        console.error(`[Quizzify] Model ${modelName} encountered a non-quota error:`, err);
-        throw err;
+        throw err; // non-quota error — fail immediately
       }
     }
 
-    // All models exhausted
+    // All models quota-exceeded
     return NextResponse.json(
-      {
-        error:
-          "All AI models are currently at their daily quota limit. Please try again tomorrow, or upgrade your Gemini API plan at https://ai.google.dev/pricing",
-      },
+      { error: "The AI is temporarily rate-limited. Please wait a minute and try again." },
       { status: 429 }
     );
   } catch (error: any) {
