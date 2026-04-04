@@ -3,13 +3,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/nextauth";
 
-// Use stable v1 API models only.
-// The SDK defaults to v1beta which does NOT support gemini-1.5-flash.
-// Forcing apiVersion: "v1" in getGenerativeModel options resolves the 404.
+// These models work on the v1beta endpoint (SDK default).
+// gemini-2.0-flash-lite has its own separate free tier quota from gemini-2.0-flash.
 const MODEL_FALLBACK_CHAIN = [
-  "gemini-1.5-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-2.0-flash",
   "gemini-1.5-flash-8b",
-  "gemini-1.0-pro",
 ];
 
 export async function POST(req: Request) {
@@ -60,10 +59,7 @@ ${extractedText.slice(0, 50000)}`;
     // Try each model in order until one succeeds
     for (const modelName of MODEL_FALLBACK_CHAIN) {
       try {
-        const model = genAI.getGenerativeModel(
-          { model: modelName },
-          { apiVersion: "v1" }
-        );
+        const model = genAI.getGenerativeModel({ model: modelName });
         const result = await model.generateContent({
           contents: [{ role: "user", parts: [{ text: prompt }] }],
         });
