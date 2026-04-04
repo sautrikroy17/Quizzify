@@ -2,16 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // One-time admin cleanup route — DELETE /api/admin/cleanup
-// This will be removed after use
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const secret = searchParams.get("secret");
+  const token = searchParams.get("token");
 
-  if (secret !== process.env.NEXTAUTH_SECRET) {
+  // Simple one-time admin token — will be deleted after use
+  if (token !== "quizzify-admin-cleanup-2025") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Delete offensive/test users
   const deleted = await prisma.user.deleteMany({
     where: {
       name: {
@@ -23,5 +22,6 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     message: `Deleted ${deleted.count} user(s) successfully.`,
+    deletedCount: deleted.count,
   });
 }
