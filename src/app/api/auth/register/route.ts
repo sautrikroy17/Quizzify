@@ -3,6 +3,22 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { validate as deepEmailValidate } from "deep-email-validator";
 
+// Blocked free/personal email providers — only institutional emails allowed
+const BLOCKED_PROVIDERS = new Set([
+  "gmail.com", "googlemail.com",
+  "yahoo.com", "yahoo.co.in", "yahoo.co.uk", "yahoo.in", "ymail.com",
+  "hotmail.com", "hotmail.co.uk", "hotmail.in",
+  "outlook.com", "outlook.in", "outlook.co.uk",
+  "live.com", "live.co.uk", "live.in",
+  "msn.com",
+  "icloud.com", "me.com", "mac.com",
+  "aol.com",
+  "protonmail.com", "pm.me", "proton.me",
+  "rediffmail.com",
+  "mail.com", "yandex.com", "yandex.ru",
+  "zoho.com",
+]);
+
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
@@ -11,18 +27,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Authenticate Email deeply (blocks throwaway/disposable, fake domains, bad format)
+    // Block common free/personal email providers
+    const domain = email.split("@")[1]?.toLowerCase();
+    if (!domain || BLOCKED_PROVIDERS.has(domain)) {
+      return NextResponse.json(
+        { error: "Personal email addresses (Gmail, Yahoo, etc.) are not allowed. Please use your institutional email." },
+        { status: 400 }
+      );
+    }
+
+    // Deep email validation — blocks disposable domains, bad MX records, typos
     const emailValidation = await deepEmailValidate({
       email: email,
       validateRegex: true,
       validateMx: true,
       validateTypo: true,
       validateDisposable: true,
-      validateSMTP: false, // SMTP validation is notoriously unreliable in serverless environments
+      validateSMTP: false,
     });
 
     if (!emailValidation.valid && emailValidation.reason !== 'smtp') {
-      return NextResponse.json({ error: "Please provide a valid, real email address." }, { status: 400 });
+      return NextResponse.json({ error: "Please provide a valid institutional email address." }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
