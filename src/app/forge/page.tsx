@@ -31,35 +31,79 @@ export default function ForgePage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [quizFinished, setQuizFinished] = useState(false);
 
-  const extractTextFromPdf = async (file: File): Promise<string> => {
-    // Polyfill ReadableStream async iteration for Safari < 16.4 which throws "undefined is not a function near '...t of e...'"
-    if (typeof ReadableStream !== 'undefined' && !(ReadableStream.prototype as any)[Symbol.asyncIterator]) {
-      (ReadableStream.prototype as any)[Symbol.asyncIterator] = async function* () {
-        const reader = this.getReader();
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) return;
-            yield value;
-          }
-        } finally {
-          reader.releaseLock();
+  // ─── Safari ReadableStream polyfill ──────────────────────────────────────────
+  // Safari < 16.4 doesn't support async iteration on ReadableStream
+  // (throws "undefined is not a function near '...t of e...'").
+  // This must be applied BEFORE pdfjs-dist is imported.
+  const applyReadableStreamPolyfill = () => {
+    if (typeof ReadableStream === 'undefined') return;
+    const proto = ReadableStream.prototype as any;
+    if (proto[Symbol.asyncIterator]) return; // already supported
+    proto[Symbol.asyncIterator] = async function* () {
+      const reader = this.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) return;
+          yield value;
         }
-      };
-    }
+      } finally {
+        try { reader.releaseLock(); } catch (_) {}
+      }
+    };
+  };
 
-    // We strictly use pdfjs-dist 3.11.174 which natively supports older platforms (Safari 14+)
+  // ─── PDF extraction (browser-side via pdfjs-dist) ─────────────────────────
+  const extractTextFromPdf = async (file: File): Promise<string> => {
+    applyReadableStreamPolyfill();
+
     const pdfjsLib = await import('pdfjs-dist');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+    // Use CDN worker — avoids bundling issues and works across all browsers
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
 
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await pdfjsLib.getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
+    }).promise;
+
     let fullText = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(" ");
-      fullText += pageText + "\n";
+      fullText += textContent.items.map((item: any) => item.str).join(" ") + "\n";
+    }
+    return fullText;
+  };
+
+  // ─── PPTX extraction (browser-side via JSZip) ─────────────────────────────
+  // PPTX files are ZIP archives — each slide is an XML file in ppt/slides/
+  // We extract the text content from <a:r><a:t>...</a:t></a:r> elements
+  const extractTextFromPptx = async (file: File): Promise<string> => {
+    const JSZip = (await import('jszip')).default;
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+
+    const slideFiles = Object.keys(zip.files)
+      .filter(name => /^ppt\/slides\/slide[0-9]+\.xml$/.test(name))
+      .sort();
+
+    let fullText = "";
+    for (const slideName of slideFiles) {
+      const xmlContent = await zip.files[slideName].async('string');
+      // Extract text from <a:t>...</a:t> XML tags
+      const matches = xmlContent.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
+      const slideText = matches
+        .map(m => m.replace(/<[^>]+>/g, ''))
+        .join(' ');
+      fullText += slideText + "\n";
+    }
+
+    if (!fullText.trim()) {
+      throw new Error("Could not extract text from the PowerPoint. Make sure the file contains readable text (not just images).");
     }
     return fullText;
   };
@@ -75,12 +119,15 @@ export default function ForgePage() {
     try {
       let extractedText = "";
       // Handle the extraction locally in browser first
+      const isPptx = file.name.toLowerCase().endsWith('.pptx') || file.name.toLowerCase().endsWith('.ppt');
       if (file.type === "application/pdf") {
         extractedText = await extractTextFromPdf(file);
+      } else if (isPptx) {
+        extractedText = await extractTextFromPptx(file);
       } else if (file.type === "text/plain") {
         extractedText = await file.text();
       } else {
-        throw new Error("Unsupported file type. Please upload a PDF or TXT.");
+        throw new Error("Unsupported file type. Please upload a PDF, PPTX, or TXT file.");
       }
 
       if (!extractedText.trim()) throw new Error("Could not extract any text from the document.");

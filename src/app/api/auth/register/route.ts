@@ -3,22 +3,6 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { validate as deepEmailValidate } from "deep-email-validator";
 
-// Blocked free/personal email providers — only institutional emails allowed
-const BLOCKED_PROVIDERS = new Set([
-  "gmail.com", "googlemail.com",
-  "yahoo.com", "yahoo.co.in", "yahoo.co.uk", "yahoo.in", "ymail.com",
-  "hotmail.com", "hotmail.co.uk", "hotmail.in",
-  "outlook.com", "outlook.in", "outlook.co.uk",
-  "live.com", "live.co.uk", "live.in",
-  "msn.com",
-  "icloud.com", "me.com", "mac.com",
-  "aol.com",
-  "protonmail.com", "pm.me", "proton.me",
-  "rediffmail.com",
-  "mail.com", "yandex.com", "yandex.ru",
-  "zoho.com",
-]);
-
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
@@ -27,45 +11,40 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Block common free/personal email providers
-    const domain = email.split("@")[1]?.toLowerCase();
-    if (!domain || BLOCKED_PROVIDERS.has(domain)) {
-      return NextResponse.json(
-        { error: "Personal email addresses (Gmail, Yahoo, etc.) are not allowed. Please use your institutional email." },
-        { status: 400 }
-      );
-    }
-
-    // Deep email validation — blocks disposable domains, bad MX records, typos
+    // Deep email validation:
+    // - Blocks malformed email addresses (regex)
+    // - Blocks domains with no MX records (fake/non-existent domains)
+    // - Detects common typos (e.g. gnail.com → gmail.com)
+    // - Blocks known disposable/throwaway email services (guerrillamail, mailinator, etc.)
+    // Personal emails (Gmail, Yahoo, etc.) are allowed as long as the address is real
     const emailValidation = await deepEmailValidate({
       email: email,
       validateRegex: true,
       validateMx: true,
       validateTypo: true,
       validateDisposable: true,
-      validateSMTP: false,
+      validateSMTP: false, // SMTP is unreliable in serverless environments
     });
 
     if (!emailValidation.valid && emailValidation.reason !== 'smtp') {
-      return NextResponse.json({ error: "Please provide a valid institutional email address." }, { status: 400 });
+      const reasonMap: Record<string, string> = {
+        regex: "Please enter a valid email address format.",
+        mx: "This email domain doesn't appear to exist. Please use a real email address.",
+        typo: `Email looks like a typo. Did you mean something else?`,
+        disposable: "Disposable/temporary email addresses are not allowed. Please use a real email.",
+      };
+      const msg = reasonMap[emailValidation.reason as string] || "Please provide a valid email address.";
+      return NextResponse.json({ error: msg }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json({ error: "Email already in use" }, { status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
+      data: { name, email, password: hashedPassword },
     });
 
     return NextResponse.json({ message: "User registered successfully", userId: user.id }, { status: 201 });
