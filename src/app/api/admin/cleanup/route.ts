@@ -13,10 +13,12 @@ export async function GET(req: Request) {
 
   const deleted = await prisma.user.deleteMany({
     where: {
-      name: {
-        contains: "chutia",
-        mode: "insensitive",
-      },
+      OR: [
+        // Delete users with offensive names
+        { name: { contains: "chutia", mode: "insensitive" } },
+        // Delete users with offensive patterns in email
+        { email: { contains: "chutia", mode: "insensitive" } },
+      ],
     },
   });
 

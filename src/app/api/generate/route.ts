@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error("GEMINI_API_KEY environment variable is missing.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const difficultyInstruction = difficulty === "mixed" 
       ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)" 
