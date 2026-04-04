@@ -3,6 +3,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/nextauth";
 
+// Fallback model chain — if one model's daily quota is exhausted, try the next.
+// Each model has a separate quota on the free tier, so this maximises uptime.
+const MODEL_FALLBACK_CHAIN = [
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-8b",
+];
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,10 +30,9 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error("GEMINI_API_KEY environment variable is missing.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const difficultyInstruction = difficulty === "mixed" 
-      ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)" 
+    const difficultyInstruction = difficulty === "mixed"
+      ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)"
       : `a ${difficulty.toUpperCase()} difficulty level`;
 
     const prompt = `You are an expert test creator. 
@@ -45,17 +51,51 @@ Output strictly as a raw JSON array of objects fulfilling this structure:
 Do not include any formatting, markdown wrappers, or extra text. ONLY return the JSON array.
 
 --- Source Text ---
-${extractedText.slice(0, 30000)}`;
+${extractedText.slice(0, 50000)}`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }]
-    });
-    const responseText = result.response.text();
-    
-    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-    const questions = JSON.parse(cleanedText);
+    let lastError: Error | null = null;
 
-    return NextResponse.json({ questions });
+    // Try each model in order until one succeeds
+    for (const modelName of MODEL_FALLBACK_CHAIN) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+        });
+        const responseText = result.response.text();
+        const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const questions = JSON.parse(cleanedText);
+
+        // Return with which model was used (helpful for debugging)
+        return NextResponse.json({ questions, model: modelName });
+      } catch (err: any) {
+        const msg = (err.message || "") + " " + String(err);
+        // 429 / quota exceeded / resource exhausted → try next model
+        if (
+          msg.includes("429") ||
+          msg.includes("quota") ||
+          msg.includes("Too Many Requests") ||
+          msg.includes("RESOURCE_EXHAUSTED") ||
+          msg.includes("rate limit")
+        ) {
+          lastError = err;
+          console.warn(`[Quizzify] Model ${modelName} quota exceeded — trying next model...`);
+          continue;
+        }
+        // Any other error (auth, parse, etc.) — fail immediately
+        console.error(`[Quizzify] Model ${modelName} encountered a non-quota error:`, err);
+        throw err;
+      }
+    }
+
+    // All models exhausted
+    return NextResponse.json(
+      {
+        error:
+          "All AI models are currently at their daily quota limit. Please try again tomorrow, or upgrade your Gemini API plan at https://ai.google.dev/pricing",
+      },
+      { status: 429 }
+    );
   } catch (error: any) {
     console.error("API Pipeline Error:", error);
     return NextResponse.json(
