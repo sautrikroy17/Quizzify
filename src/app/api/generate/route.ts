@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error("GEMINI_API_KEY environment variable is missing.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const difficultyInstruction = difficulty === "mixed"
       ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)"
@@ -46,41 +47,15 @@ Do not include any formatting, markdown wrappers, or extra text. ONLY return the
 --- Source Text ---
 ${extractedText.slice(0, 30000)}`;
 
-    // Try models in order — all exist on v1beta (SDK default endpoint)
-    const models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"];
-    let lastError: any = null;
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }]
+    });
+    const responseText = result.response.text();
 
-    for (const modelName of models) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        });
-        const responseText = result.response.text();
-        const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-        const questions = JSON.parse(cleanedText);
-        return NextResponse.json({ questions });
-      } catch (err: any) {
-        const msg = (err.message || "") + " " + String(err);
-        if (
-          msg.includes("429") ||
-          msg.includes("quota") ||
-          msg.includes("Too Many Requests") ||
-          msg.includes("RESOURCE_EXHAUSTED") ||
-          msg.includes("rate limit")
-        ) {
-          lastError = err;
-          continue; // try next model
-        }
-        throw err; // non-quota error — fail immediately
-      }
-    }
+    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const questions = JSON.parse(cleanedText);
 
-    // All models quota-exceeded
-    return NextResponse.json(
-      { error: "The AI is temporarily rate-limited. Please wait a minute and try again." },
-      { status: 429 }
-    );
+    return NextResponse.json({ questions });
   } catch (error: any) {
     console.error("API Pipeline Error:", error);
     return NextResponse.json(
