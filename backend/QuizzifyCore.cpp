@@ -1,200 +1,264 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <memory>
-#include <ctime>
 
 using namespace std;
 
-// ==========================================
-// ABSTRACTION & ENCAPSULATION
-// Interface representing any measurable item
-// ==========================================
-class IMeasurable {
-public:
-    virtual int getScore() const = 0;
-    virtual ~IMeasurable() = default;
-};
-
-// ==========================================
-// CORE CLASSES: Question
-// Demonstrates strong encapsulation
-// ==========================================
+// ============================================
+// CLASS: Question
+// Demonstrates: Encapsulation, Constructor, Destructor
+// ============================================
 class Question {
 private:
+    // Private data - cannot be accessed directly from outside
     string text;
     vector<string> options;
     int correctOptionIndex;
 
 public:
-    Question(string q, vector<string> opts, int correctIndex) 
-        : text(q), options(opts), correctOptionIndex(correctIndex) {}
+    // Constructor - runs automatically when object is created
+    Question(string t, vector<string> opts, int correct) {
+        text = t;
+        options = opts;
+        correctOptionIndex = correct;
+        cout << "Question created: " << text << endl;
+    }
 
-    string getText() const { return text; }
-    vector<string> getOptions() const { return options; }
-    
-    bool checkAnswer(int selectedIndex) const {
-        return selectedIndex == correctOptionIndex;
+    // Destructor - runs automatically when object is destroyed
+    ~Question() {
+        cout << "Question destroyed: " << text << endl;
+    }
+
+    // Public methods - the only way to access private data
+    string getText() {
+                return text;
+    }
+
+    void display() {
+                cout << "Q: " << text << endl;
+        for (int i = 0; i < options.size(); i++) {
+            cout << i + 1 << ". " << options[i] << endl;
+        }
+    }
+
+    bool checkAnswer(int selected) {
+                return selected == correctOptionIndex;
     }
 };
 
-// ==========================================
-// POLYMORPHISM & INHERITANCE
-// Base Assessment Class
-// ==========================================
-class Assessment : public IMeasurable {
+
+// ============================================
+// BASE CLASS: Assessment
+// Demonstrates: Abstraction (pure virtual function)
+// ============================================
+class Assessment {
 protected:
-    string id;
     string title;
-    vector<Question> questions;
     int currentScore;
 
 public:
-    Assessment(string t) : title(t), currentScore(0) {
-        id = "ASSESS_" + to_string(time(0));
+    // Constructor
+    Assessment(string t) {
+        title = t;
+        currentScore = 0;
+        cout << "Assessment created: " << title << endl;
     }
 
-    void addQuestion(const Question& q) {
-        questions.push_back(q);
+    // Destructor
+    virtual ~Assessment() {
+        cout << "Assessment destroyed: " << title << endl;
     }
 
-    // Pure virtual function making this an Abstract Class
+    // Pure virtual function - subclasses MUST implement this
+    // This is what makes Assessment an abstract class
     virtual void conductAssessment() = 0;
 
-    int getScore() const override {
-        return currentScore;
+    string getTitle() {
+                return title;
     }
-    
-    virtual ~Assessment() = default;
+
+    int getScore() {
+                return currentScore;
+    }
 };
 
-// Derived Class 1: Practice Mode (No timer, shows answers)
+
+// ============================================
+// DERIVED CLASS 1: PracticeQuiz
+// Demonstrates: Inheritance, Runtime Polymorphism
+// ============================================
 class PracticeQuiz : public Assessment {
 public:
+    // Constructor calling parent constructor
     PracticeQuiz(string t) : Assessment(t) {}
 
-    void conductAssessment() override {
-        cout << "--- Starting Practice Module: " << title << " ---" << endl;
-        cout << "(Hints Enabled. Take Your Time.)" << endl;
-        
-        // Simulating taking a quiz
-        currentScore = questions.size() * 10; // Auto-pass for demo
-        cout << "Practice Completed! You learned the concepts." << endl;
+    // Override the base class function - Runtime Polymorphism
+    void conductAssessment() {
+                cout << "=== PRACTICE MODE ===" << endl;
+        cout << "Quiz: " << title << endl;
+        cout << "Answers shown immediately after each question." << endl;
+        cout << "No timer. Relax and learn!" << endl;
+        currentScore = 8; // example score
     }
 };
 
-// Derived Class 2: Competitive Test Mode (Timed, affects Leaderboard)
+
+// ============================================
+// DERIVED CLASS 2: CompetitiveTest
+// Demonstrates: Inheritance, Runtime Polymorphism
+// ============================================
 class CompetitiveTest : public Assessment {
 private:
     int timeLimitSeconds;
 
 public:
-    CompetitiveTest(string t, int timeLimit) : Assessment(t), timeLimitSeconds(timeLimit) {}
+    // Constructor
+    CompetitiveTest(string t, int timeLimit) : Assessment(t) {
+        timeLimitSeconds = timeLimit;
+    }
 
-    void conductAssessment() override {
-        cout << "*** STARTING COMPETITIVE EXAM: " << title << " ***" << endl;
-        cout << "TIME LIMIT: " << timeLimitSeconds << " seconds." << endl;
-        
-        // Simulating the stress test
-        currentScore = questions.size() * 10; 
-        cout << "Exam Completed under time pressure. Score secured!" << endl;
+    // Override the base class function - Runtime Polymorphism
+    void conductAssessment() {
+                cout << "=== TEST MODE ===" << endl;
+        cout << "Quiz: " << title << endl;
+        cout << "Time limit: " << timeLimitSeconds << " seconds." << endl;
+        cout << "Score will be saved to the leaderboard!" << endl;
+        currentScore = 9; // example score
     }
 };
 
 
-// ==========================================
-// INHERITANCE: User Types
-// Demonstrates hierarchical classes
-// ==========================================
+// ============================================
+// BASE CLASS: User
+// Demonstrates: Inheritance, Polymorphism
+// ============================================
 class User {
 protected:
-    string userId;
-    string email;
     string name;
+    string email;
 
 public:
-    User(string id, string e, string n) : userId(id), email(e), name(n) {}
-    
-    virtual void displayDashboard() const {
-        cout << "Welcome back, " << name << endl;
+    // Constructor
+    User(string n, string e) {
+        name = n;
+        email = e;
+        cout << "User created: " << name << endl;
     }
 
-    string getName() const { return name; }
-    
-    virtual ~User() = default;
+    // Virtual destructor
+    virtual ~User() {
+        cout << "User destroyed: " << name << endl;
+    }
+
+    // Virtual function - can be overridden by subclasses
+    virtual void displayDashboard() {
+                cout << "User: " << name << " | Email: " << email << endl;
+    }
+
+    string getName() {
+                return name;
+    }
 };
 
+
+// ============================================
+// DERIVED CLASS: Student
+// Demonstrates: Inheritance, Polymorphism
+// ============================================
 class Student : public User {
 private:
     int totalScore;
     int quizzesTaken;
 
 public:
-    Student(string id, string e, string n) : User(id, e, n), totalScore(0), quizzesTaken(0) {}
+    // Constructor
+    Student(string n, string e) : User(n, e) {
+        totalScore = 0;
+        quizzesTaken = 0;
+    }
 
-    void recordAssessment(const unique_ptr<Assessment>& assessment) {
-        assessment->conductAssessment();
-        totalScore += assessment->getScore();
+    // Override displayDashboard - Runtime Polymorphism
+    void displayDashboard() {
+                cout << "--- STUDENT DASHBOARD ---" << endl;
+        cout << "Name: " << name << endl;
+        cout << "Total Score: " << totalScore << endl;
+        cout << "Quizzes Taken: " << quizzesTaken << endl;
+    }
+
+    void updateScore(int score) {
+                totalScore += score;
         quizzesTaken++;
     }
-
-    void displayDashboard() const override {
-        cout << "========================================" << endl;
-        cout << "🎓 STUDENT DASHBOARD: " << name << endl;
-        cout << "Total EXP Score: " << totalScore << endl;
-        cout << "Assessments Conquered: " << quizzesTaken << endl;
-        cout << "========================================" << endl;
-    }
 };
 
+
+// ============================================
+// DERIVED CLASS: Admin
+// Demonstrates: Inheritance, Polymorphism
+// ============================================
 class Admin : public User {
 public:
-    Admin(string id, string e, string n) : User(id, e, n) {}
-    
-    void displayDashboard() const override {
-        cout << "⚙️ SYSTEM ADMIN DASHBOARD: " << name << endl;
-        cout << "System Status: Online. Leaderboards Synchronized." << endl;
+    // Constructor
+    Admin(string n, string e) : User(n, e) {}
+
+    // Override displayDashboard - Runtime Polymorphism
+    void displayDashboard() {
+                cout << "--- ADMIN PANEL ---" << endl;
+        cout << "Admin: " << name << endl;
+        cout << "Access: Full system control" << endl;
+    }
+
+    void removeUser(string userName) {
+                cout << "Admin removed user: " << userName << endl;
     }
 };
 
 
-// ==========================================
-// SYSTEM ENGINE (Singleton Design Pattern concept)
-// ==========================================
+// ============================================
+// MAIN FUNCTION
+// Shows all OOP concepts in action
+// ============================================
 int main() {
-    cout << "INITIALIZING QUIZZIFY AI C++ CORE ENGINE...\n" << endl;
+        cout << "===== QUIZZIFY AI - OOP DEMO =====" << endl << endl;
 
-    // 1. Instantiating Users
-    Student user1("U001", "krish@university.edu", "Krish");
-    Admin sysAdmin("A001", "root@quizzify.com", "System Overseer");
+    // 1. ENCAPSULATION + CONSTRUCTOR
+    cout << "--- Creating Questions ---" << endl;
+    vector<string> opts1 = {"Data Hiding", "Inheritance", "Polymorphism", "None"};
+    Question q1("What is Encapsulation?", opts1, 0);
+    q1.display();
+    cout << "Correct answer check: " << (q1.checkAnswer(0) ? "Correct!" : "Wrong!") << endl;
+    cout << endl;
 
-    // 2. Polymorphism: Base class pointer array
-    vector<User*> systemUsers;
-    systemUsers.push_back(&user1);
-    systemUsers.push_back(&sysAdmin);
+    // 2. ABSTRACTION + INHERITANCE + RUNTIME POLYMORPHISM
+    cout << "--- Creating Assessments ---" << endl;
+    // Base class pointer pointing to derived class object = Polymorphism
+    Assessment* test1 = new PracticeQuiz("Operating Systems");
+    Assessment* test2 = new CompetitiveTest("Computer Networks", 600);
 
-    // 3. Document AI Pipeline Simulation (Abstraction)
-    cout << "[AI ENGINE] Parsing Uploaded PDF: 'Operating_Systems_Ch1.pdf'..." << endl;
-    
-    // Using Smart Pointers to manage Memory Exceptionally well
-    unique_ptr<Assessment> practice = make_unique<PracticeQuiz>("OS Fundamentals (Practice)");
-    practice->addQuestion(Question("What is a kernel?", {"Hardware", "Core OS Program", "App"}, 1));
-    
-    unique_ptr<Assessment> exam = make_unique<CompetitiveTest>("OS Fundamentals (Ranked Exam)", 600);
-    exam->addQuestion(Question("What is deadlock?", {"Process Starvation", "Memory Access", "Endless Wait"}, 2));
+    // Same function call - different behaviour at runtime = Runtime Polymorphism
+    test1->conductAssessment();
+    cout << endl;
+    test2->conductAssessment();
+    cout << endl;
 
-    // 4. Executing Logic
-    user1.recordAssessment(practice);
-    cout << "\n";
-    user1.recordAssessment(exam);
-    cout << "\n";
+    // 3. INHERITANCE + POLYMORPHISM with User hierarchy
+    cout << "--- User Hierarchy ---" << endl;
+    User* user1 = new Student("Krish", "krish@college.edu");
+    User* user2 = new Admin("Professor", "prof@college.edu");
 
-    // 5. Demonstrating Virtual Functions / Dynamic Dispatch
-    for (const auto* user : systemUsers) {
-        user->displayDashboard();
-    }
+    // Same function call on base class pointer - different result each time
+    user1->displayDashboard();
+    cout << endl;
+    user2->displayDashboard();
+    cout << endl;
 
-    cout << "\nSYSTEM SHUTDOWN SEQUENCE INITIATED..." << endl;
+    // 4. DESTRUCTOR - called when delete is used
+    cout << "--- Cleaning Up ---" << endl;
+    delete test1;
+    delete test2;
+    delete user1;
+    delete user2;
 
+    cout << endl << "Program ended." << endl;
     return 0;
 }
