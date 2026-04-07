@@ -3,13 +3,7 @@
 //   File: QuizzifyFrontend.java
 //   Location: frontend/ folder
 //
-//   PURPOSE:
-//   This Java file demonstrates the exact same logic that the
-//   Next.js frontend (src/ folder) uses — written in simple Java
-//   so it can be easily explained to a professor.
-//
-//   THE REAL CODE is in TypeScript (Next.js/React) inside src/
-//   This Java file is the CONCEPTUAL BLUEPRINT of that code.
+//   
 // ============================================================
 
 import java.util.ArrayList;
