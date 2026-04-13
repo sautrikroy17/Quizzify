@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Quizzify AI — OOP Concepts in C++</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Fira+Code:wght@400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a2e;font-size:13px;line-height:1.6;}
+
+  /* ── Cover Page ── */
+  .cover{height:100vh;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;page-break-after:always;}
+  .cover-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#a8b4ff;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:8px 20px;border-radius:50px;margin-bottom:30px;}
+  .cover h1{font-size:52px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:16px;}
+  .cover h1 span{background:linear-gradient(90deg,#4facfe,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .cover-sub{font-size:18px;color:rgba(255,255,255,.6);margin-bottom:50px;max-width:600px;}
+  .cover-meta{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px 40px;display:flex;gap:50px;}
+  .cover-meta div{text-align:center;}
+  .cover-meta .label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .cover-meta .value{font-size:15px;font-weight:700;color:#fff;}
+  .cover-concepts{margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .cover-concepts span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;}
+
+  /* ── Page layout ── */
+  .page{padding:50px 55px;page-break-before:always;}
+  .page:first-of-type{page-break-before:avoid;}
+
+  /* ── Section header ── */
+  .concept-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #f0f0f0;}
+  .concept-number{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0;}
+  .n1{background:linear-gradient(135deg,#667eea,#764ba2);}
+  .n2{background:linear-gradient(135deg,#f093fb,#f5576c);}
+  .n3{background:linear-gradient(135deg,#4facfe,#00f2fe);}
+  .n4{background:linear-gradient(135deg,#43e97b,#38f9d7);}
+  .n5{background:linear-gradient(135deg,#fa709a,#fee140);}
+  .n6{background:linear-gradient(135deg,#a18cd1,#fbc2eb);}
+  .n7{background:linear-gradient(135deg,#ffecd2,#fcb69f);color:#333 !important;}
+  .concept-title{flex:1;}
+  .concept-title h2{font-size:24px;font-weight:900;color:#1a1a2e;margin-bottom:4px;}
+  .concept-title .tagline{font-size:13px;color:#666;font-style:italic;}
+
+  /* ── Definition box ── */
+  .definition{background:linear-gradient(135deg,#667eea11,#764ba211);border-left:4px solid #667eea;border-radius:0 12px 12px 0;padding:16px 20px;margin-bottom:22px;}
+  .definition .def-label{font-size:10px;font-weight:700;color:#667eea;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .definition p{font-size:13.5px;color:#2d2d4e;font-weight:500;line-height:1.7;}
+
+  /* ── Two col layout ── */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+  .two-col-65{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;margin-bottom:20px;}
+
+  /* ── Code block ── */
+  .code-block{background:#0d1117;border-radius:12px;overflow:hidden;margin-bottom:18px;}
+  .code-header{background:#161b22;padding:10px 16px;display:flex;align-items:center;gap:8px;}
+  .code-header .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-r{background:#ff5f57;} .dot-y{background:#febc2e;} .dot-g{background:#28c840;}
+  .code-header .filename{font-size:11px;color:#8b949e;font-family:'Fira Code',monospace;margin-left:6px;}
+  .code-header .badge{margin-left:auto;background:#238636;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:1px;}
+  pre{padding:16px;font-family:'Fira Code',monospace;font-size:12px;line-height:1.8;overflow-x:auto;color:#e6edf3;}
+  .kw{color:#ff7b72;} /* keywords */
+  .cls{color:#ffa657;} /* class names */
+  .fn{color:#d2a8ff;} /* function names */
+  .cm{color:#8b949e;} /* comments */
+  .str{color:#a5d6ff;} /* strings */
+  .num{color:#79c0ff;} /* numbers */
+  .hl{background:rgba(255,255,255,.07);display:block;margin:0 -16px;padding:0 16px;border-left:3px solid #4facfe;}
+
+  /* ── Info card ── */
+  .info-card{border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+  .info-card .ic-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .card-blue{background:#dbeafe;border:1px solid #93c5fd;}
+  .card-blue .ic-title{color:#1d4ed8;}
+  .card-blue p{color:#1e3a5f;}
+  .card-green{background:#dcfce7;border:1px solid #86efac;}
+  .card-green .ic-title{color:#15803d;}
+  .card-green p{color:#14532d;}
+  .card-purple{background:#f3e8ff;border:1px solid #c084fc;}
+  .card-purple .ic-title{color:#7e22ce;}
+  .card-purple p{color:#3b0764;}
+  .card-red{background:#fee2e2;border:1px solid #fca5a5;}
+  .card-red .ic-title{color:#b91c1c;}
+  .card-red p{color:#450a0a;}
+  .card-amber{background:#fef3c7;border:1px solid #fcd34d;}
+  .card-amber .ic-title{color:#92400e;}
+  .card-amber p{color:#451a03;}
+  .card-dark{background:#0d1117;border:1px solid #30363d;}
+  .card-dark .ic-title{color:#4facfe;}
+  .card-dark p{color:#e6edf3;}
+
+  /* ── Analogy box ── */
+  .analogy{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 18px;margin-bottom:18px;}
+  .analogy .a-label{font-size:10px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .analogy p{color:#78350f;font-size:13px;}
+
+  /* ── Why used ── */
+  .why{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 18px;margin-bottom:18px;}
+  .why .w-label{font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .why p{color:#14532d;font-size:13px;}
+
+  /* ── Table ── */
+  table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12.5px;}
+  th{background:#1a1a2e;color:#fff;padding:10px 14px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;}
+  td{padding:10px 14px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+  tr:nth-child(even) td{background:#f8f9ff;}
+  td code{font-family:'Fira Code',monospace;font-size:11.5px;background:#f1f3f5;padding:2px 6px;border-radius:4px;color:#e03e3e;}
+
+  /* ── Diagram ── */
+  .diagram{background:#0d1117;border-radius:12px;padding:20px;margin-bottom:20px;font-family:'Fira Code',monospace;font-size:12px;color:#e6edf3;line-height:1.9;}
+  .d-label{font-size:10px;font-weight:700;color:#4facfe;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+
+  /* ── Summary table on last page ── */
+  .summary-page{padding:50px 55px;page-break-before:always;}
+  .summary-header{text-align:center;margin-bottom:40px;}
+  .summary-header h2{font-size:32px;font-weight:900;color:#1a1a2e;margin-bottom:8px;}
+  .summary-header p{color:#666;font-size:14px;}
+  .summary-table th{background:linear-gradient(135deg,#302b63,#24243e);}
+  .tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .tag-enc{background:#ede9fe;color:#7c3aed;}
+  .tag-abs{background:#fee2e2;color:#b91c1c;}
+  .tag-inh{background:#dbeafe;color:#1d4ed8;}
+  .tag-pol{background:#dcfce7;color:#15803d;}
+  .tag-spt{background:#fef3c7;color:#92400e;}
+
+  /* ── Print ── */
+  @media print{
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .page,.summary-page,.cover{page-break-inside:avoid;}
+  }
+  @page{margin:0;size:A4;}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ COVER ════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Academic Viva Report</div>
+  <h1>OOP Concepts in<br/><span>QuizzifyCore.cpp</span></h1>
+  <p class="cover-sub">A complete line-by-line breakdown of every Object-Oriented Programming concept used in the Quizzify AI C++ backend engine.</p>
+  <div class="cover-meta">
+    <div><div class="label">File</div><div class="value">QuizzifyCore.cpp</div></div>
+    <div><div class="label">Language</div><div class="value">C++17</div></div>
+    <div><div class="label">Lines of Code</div><div class="value">201</div></div>
+    <div><div class="label">Concepts Covered</div><div class="value">7</div></div>
+  </div>
+  <div class="cover-concepts">
+    <span>Encapsulation</span>
+    <span>Abstraction</span>
+    <span>Inheritance</span>
+    <span>Polymorphism</span>
+    <span>Smart Pointers</span>
+    <span>Virtual Destructor</span>
+    <span>Initializer Lists</span>
+  </div>
+</div>
+
+<!-- ════════════════ CONCEPT 1: ENCAPSULATION ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n1">1</div>
+    <div class="concept-title">
+      <h2>Encapsulation</h2>
+      <div class="tagline">Hiding data inside a class — accessible only through a safe, controlled interface</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>Encapsulation is the principle of bundling data (variables) and the methods that operate on that data into a single unit (class), and restricting direct access to some of the object's components. Only selected methods are exposed as a public interface.</p>
+  </div>
+
+  <div class="two-col-65">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">QuizzifyCore.cpp — Lines 23–39</span><span class="badge">ENCAPSULATION</span></div>
+        <pre><span class="kw">class</span> <span class="cls">Question</span> {
+<span class="hl"><span class="kw">private</span>:                       <span class="cm">// 🔒 LOCKED from outside</span>
+    string text;
+    vector&lt;string&gt; options;
+    <span class="num">int</span> correctOptionIndex;   <span class="cm">// ← answer is HIDDEN</span></span>
+
+<span class="kw">public</span>:                        <span class="cm">// ✅ Safe interface</span>
+    <span class="cm">// Constructor</span>
+    <span class="fn">Question</span>(string q, vector&lt;string&gt; opts, <span class="num">int</span> idx)
+        : text(q), options(opts),
+          correctOptionIndex(idx) {}
+
+    string <span class="fn">getText</span>() <span class="kw">const</span> { <span class="kw">return</span> text; }
+    vector&lt;string&gt; <span class="fn">getOptions</span>() <span class="kw">const</span> { <span class="kw">return</span> options; }
+
+<span class="hl">    <span class="num">bool</span> <span class="fn">checkAnswer</span>(<span class="num">int</span> selectedIndex) <span class="kw">const</span> {
+        <span class="kw">return</span> selectedIndex == correctOptionIndex;
+    }                          <span class="cm">// ← You can CHECK but never READ</span></span>
+};</pre>
+      </div>
+    </div>
+    <div>
+      <div class="why">
+        <div class="w-label">✅ Why Used Here</div>
+        <p>The <code>correctOptionIndex</code> stores the answer to a quiz question. If it were public, any code could read the answer directly — defeating the purpose of a quiz. By making it private, the only way to interact with the answer is through <code>checkAnswer()</code>, which returns only <strong>true/false</strong>.</p>
+      </div>
+      <div class="analogy">
+        <div class="a-label">💡 Real-World Analogy</div>
+        <p>Like an ATM — it has your bank balance stored internally (private), but you can only <em>check</em> it through the screen interface (public method). You cannot reach inside and modify the number directly.</p>
+      </div>
+      <div class="info-card card-red">
+        <div class="ic-title">❌ Without Encapsulation</div>
+        <p>Someone could write <code>q.correctOptionIndex = 0;</code> and force every answer to be option A — the quiz is broken.</p>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Member</th><th>Access Level</th><th>Reason</th></tr>
+    <tr><td><code>text</code></td><td>private</td><td>Question text shouldn't be altered after creation</td></tr>
+    <tr><td><code>options</code></td><td>private</td><td>Options list is fixed — immutable after construction</td></tr>
+    <tr><td><code>correctOptionIndex</code></td><td>private</td><td>The answer must be hidden to prevent cheating</td></tr>
+    <tr><td><code>getText()</code></td><td>public</td><td>UI needs to display the question text — read-only access</td></tr>
+    <tr><td><code>checkAnswer()</code></td><td>public</td><td>Validates a student's answer without revealing the correct index</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════ CONCEPT 2: ABSTRACTION ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n2">2</div>
+    <div class="concept-title">
+      <h2>Abstraction</h2>
+      <div class="tagline">Defining WHAT must exist, without specifying HOW it works</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>Abstraction means exposing only the essential features of an object and hiding the complex implementation details. In C++, this is achieved through <strong>pure virtual functions</strong> (making abstract classes) and <strong>interfaces</strong> (classes with only pure virtual functions).</p>
+  </div>
+
+  <p style="font-weight:700;margin-bottom:14px;color:#555;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Two layers of abstraction in this file:</p>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 13–17 — Interface</span><span class="badge">LAYER 1</span></div>
+        <pre><span class="cm">// Pure Interface — no data, no body</span>
+<span class="kw">class</span> <span class="cls">IMeasurable</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">virtual</span> <span class="num">int</span> <span class="fn">getScore</span>() <span class="kw">const</span> = <span class="num">0</span>;</span>
+    <span class="cm">// "= 0" means: I declare this must</span>
+    <span class="cm">// exist but I don't implement it.</span>
+    <span class="kw">virtual</span> ~<span class="fn">IMeasurable</span>() = <span class="kw">default</span>;
+};</pre>
+      </div>
+      <div class="info-card card-purple">
+        <div class="ic-title">Interface Rule</div>
+        <p><strong>ONLY</strong> pure virtual functions. No data members. No implementation. It is a pure contract — a list of promises that implementing classes must fulfill.</p>
+      </div>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 45–69 — Abstract Class</span><span class="badge">LAYER 2</span></div>
+        <pre><span class="kw">class</span> <span class="cls">Assessment</span> : <span class="kw">public</span> <span class="cls">IMeasurable</span> {
+<span class="kw">protected</span>:
+    string id, title;
+    vector&lt;<span class="cls">Question</span>&gt; questions;
+    <span class="num">int</span> currentScore;          <span class="cm">// ← Has real data</span>
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">addQuestion</span>(...) { ... } <span class="cm">// Real method</span>
+
+<span class="hl">    <span class="kw">virtual void</span> <span class="fn">conductAssessment</span>() = <span class="num">0</span>;</span>
+    <span class="cm">// ↑ Still abstract — subclasses must</span>
+    <span class="cm">//   provide their own version</span>
+
+    <span class="num">int</span> <span class="fn">getScore</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> currentScore; <span class="cm">// ← Implements IMeasurable</span>
+    }
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="why">
+      <div class="w-label">✅ Why IMeasurable Was Created</div>
+      <p><code>Assessment</code> and future classes (e.g., <code>Assignment</code>, <code>Project</code>) can all be stored in the same collection if they share the <code>IMeasurable</code> interface. Any code that needs a score just calls <code>getScore()</code> — it doesn't care what type of measurable thing it is.</p>
+    </div>
+    <div class="analogy">
+      <div class="a-label">💡 Real-World Analogy</div>
+      <p>A <strong>"Vehicle"</strong> interface says: all vehicles must have <code>start()</code> and <code>stop()</code>. A Car, Truck, and Motorcycle all implement it differently. You can command any vehicle to start without knowing how its engine works.</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Class</th><th>Type</th><th>Can be instantiated?</th><th>Reason</th></tr>
+    <tr><td><code>IMeasurable</code></td><td>Interface</td><td>❌ No</td><td>Has pure virtual function <code>getScore()=0</code></td></tr>
+    <tr><td><code>Assessment</code></td><td>Abstract Class</td><td>❌ No</td><td>Has pure virtual function <code>conductAssessment()=0</code></td></tr>
+    <tr><td><code>PracticeQuiz</code></td><td>Concrete Class</td><td>✅ Yes</td><td>Implements all pure virtual functions</td></tr>
+    <tr><td><code>CompetitiveTest</code></td><td>Concrete Class</td><td>✅ Yes</td><td>Implements all pure virtual functions</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════ CONCEPT 3: INHERITANCE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n3">3</div>
+    <div class="concept-title">
+      <h2>Inheritance</h2>
+      <div class="tagline">Child classes inherit properties and behaviour from parent classes — reuse without rewriting</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>Inheritance is a mechanism where a new class (derived/child) acquires the properties and methods of an existing class (base/parent) using the <code>:</code> syntax. The child can use all inherited members and additionally define its own. It models "is-a" relationships.</p>
+  </div>
+
+  <p style="font-weight:700;margin-bottom:14px;color:#555;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Two separate inheritance trees in this file:</p>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 72–102 — Assessment Tree</span><span class="badge">TREE 1</span></div>
+        <pre><span class="cm">// PracticeQuiz IS-A Assessment</span>
+<span class="kw">class</span> <span class="cls">PracticeQuiz</span> : <span class="kw">public</span> <span class="cls">Assessment</span> {
+<span class="kw">public</span>:
+    <span class="cm">// Calls parent constructor</span>
+<span class="hl">    <span class="fn">PracticeQuiz</span>(string t) : <span class="fn">Assessment</span>(t) {}</span>
+
+    <span class="kw">void</span> <span class="fn">conductAssessment</span>() <span class="kw">override</span> {
+        cout &lt;&lt; <span class="str">"(Hints Enabled)"</span> &lt;&lt; endl;
+        currentScore = <span class="cm">// ← uses parent's var</span>
+            questions.size() * <span class="num">10</span>;
+    }
+};
+
+<span class="cm">// CompetitiveTest IS-A Assessment</span>
+<span class="kw">class</span> <span class="cls">CompetitiveTest</span> : <span class="kw">public</span> <span class="cls">Assessment</span> {
+<span class="kw">private</span>:
+<span class="hl">    <span class="num">int</span> timeLimitSeconds; <span class="cm">// ← EXTRA field</span></span>
+<span class="kw">public</span>:
+    <span class="fn">CompetitiveTest</span>(string t, <span class="num">int</span> timeLimit)
+        : <span class="fn">Assessment</span>(t),
+          timeLimitSeconds(timeLimit) {}
+
+    <span class="kw">void</span> <span class="fn">conductAssessment</span>() <span class="kw">override</span> {
+        cout &lt;&lt; <span class="str">"TIME LIMIT: "</span>
+             &lt;&lt; timeLimitSeconds &lt;&lt; endl;
+        currentScore = questions.size()*<span class="num">10</span>;
+    }
+};</pre>
+      </div>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 109–158 — User Tree</span><span class="badge">TREE 2</span></div>
+        <pre><span class="kw">class</span> <span class="cls">User</span> {            <span class="cm">// Base class</span>
+<span class="kw">protected</span>:
+    string userId, email, name;
+<span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">displayDashboard</span>() <span class="kw">const</span>;
+};
+
+<span class="kw">class</span> <span class="cls">Student</span> : <span class="kw">public</span> <span class="cls">User</span> {
+<span class="kw">private</span>:
+<span class="hl">    <span class="num">int</span> totalScore;      <span class="cm">// ← Student-specific</span>
+    <span class="num">int</span> quizzesTaken;</span>
+<span class="kw">public</span>:
+    <span class="fn">Student</span>(string id, string e, string n)
+<span class="hl">        : <span class="fn">User</span>(id, e, n),  <span class="cm">// parent init</span>
+          totalScore(<span class="num">0</span>), quizzesTaken(<span class="num">0</span>) {}</span>
+
+    <span class="kw">void</span> <span class="fn">recordAssessment</span>(...) { ... }
+    <span class="kw">void</span> <span class="fn">displayDashboard</span>() <span class="kw">const override</span>;
+};
+
+<span class="kw">class</span> <span class="cls">Admin</span> : <span class="kw">public</span> <span class="cls">User</span> {
+<span class="kw">public</span>:
+    <span class="fn">Admin</span>(string id, string e, string n)
+        : <span class="fn">User</span>(id, e, n) {} <span class="cm">// no extras</span>
+    <span class="kw">void</span> <span class="fn">displayDashboard</span>() <span class="kw">const override</span>;
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="why">
+      <div class="w-label">✅ What is Inherited (FREE for child classes)</div>
+      <p>Both <code>PracticeQuiz</code> and <code>CompetitiveTest</code> automatically get: <code>title</code>, <code>questions</code>, <code>currentScore</code>, <code>addQuestion()</code>, <code>getScore()</code> — without writing a single line to re-implement them. Code reuse is the key benefit.</p>
+    </div>
+    <div class="analogy">
+      <div class="a-label">💡 Real-World Analogy</div>
+      <p>A <strong>Student</strong> and a <strong>Professor</strong> are both <strong>People</strong> — they inherit name, age, ID. But a Student additionally has <em>grades</em> and a Professor has <em>salary</em>. They share common base, differ in specifics.</p>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <div class="d-label">Class Hierarchy Diagram</div>
+IMeasurable (Interface — pure virtual)
+    └── Assessment (Abstract — has data + one pure virtual)
+            ├── PracticeQuiz    ← adds: relaxed mode, no timer
+            └── CompetitiveTest ← adds: timeLimitSeconds, timed pressure
+
+User (Base Class — has name, email, userId)
+    ├── Student ← adds: totalScore, quizzesTaken, recordAssessment()
+    └── Admin   ← no extra data, different displayDashboard()
+  </div>
+</div>
+
+<!-- ════════════════ CONCEPT 4: POLYMORPHISM ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n4">4</div>
+    <div class="concept-title">
+      <h2>Polymorphism</h2>
+      <div class="tagline">Same function name — different behaviour — correct version chosen automatically at runtime</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>Polymorphism (Greek: "many forms") allows objects of different types to be treated as objects of a common base type. When a virtual function is called through a base class pointer, C++ automatically invokes the correct overridden version based on the actual runtime type of the object. This is called <strong>dynamic dispatch</strong>.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">QuizzifyCore.cpp — Lines 172–195 — main()</span><span class="badge">POLYMORPHISM</span></div>
+    <pre><span class="cm">// A vector of BASE CLASS pointers — holds different derived types</span>
+<span class="hl">vector&lt;<span class="cls">User</span>*&gt; systemUsers;         <span class="cm">// ← stores User* not Student* or Admin*</span></span>
+systemUsers.<span class="fn">push_back</span>(&amp;user1);    <span class="cm">// user1 is a Student</span>
+systemUsers.<span class="fn">push_back</span>(&amp;sysAdmin); <span class="cm">// sysAdmin is an Admin</span>
+
+<span class="cm">// One loop — calls SAME function — gets DIFFERENT results</span>
+<span class="kw">for</span> (<span class="kw">const auto</span>* user : systemUsers) {
+<span class="hl">    user-&gt;<span class="fn">displayDashboard</span>();        <span class="cm">// Which version? Decided at RUNTIME!</span></span>
+}
+
+<span class="cm">// OUTPUT:</span>
+<span class="cm">// ========================================</span>
+<span class="cm">// 🎓 STUDENT DASHBOARD: Krish            ← Student's version ran</span>
+<span class="cm">// Total EXP Score: 200</span>
+<span class="cm">// ========================================</span>
+<span class="cm">// ⚙️ SYSTEM ADMIN DASHBOARD: System Overseer ← Admin's version ran</span></pre>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">virtual keyword enables this</span></div>
+        <pre><span class="kw">class</span> <span class="cls">User</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">virtual void</span> <span class="fn">displayDashboard</span>() <span class="kw">const</span> {</span>
+        cout &lt;&lt; <span class="str">"Welcome back, "</span> &lt;&lt; name;
+    }
+    <span class="cm">// 'virtual' = enable dynamic dispatch</span>
+};
+
+<span class="kw">class</span> <span class="cls">Student</span> : <span class="kw">public</span> <span class="cls">User</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">void</span> <span class="fn">displayDashboard</span>() <span class="kw">const override</span> {</span>
+        cout &lt;&lt; <span class="str">"🎓 STUDENT DASHBOARD"</span>;
+        cout &lt;&lt; <span class="str">"Score: "</span> &lt;&lt; totalScore;
+    }
+    <span class="cm">// 'override' confirms we replace parent</span>
+};</pre>
+      </div>
+    </div>
+    <div>
+      <div class="info-card card-red">
+        <div class="ic-title">❌ Without virtual — WRONG</div>
+        <p>If <code>displayDashboard()</code> is NOT virtual, calling it through a <code>User*</code> pointer would <strong>always</strong> run <code>User::displayDashboard()</code> — even if the object is a Student. This is called compile-time binding (wrong answer).</p>
+      </div>
+      <div class="info-card card-green">
+        <div class="ic-title">✅ With virtual — CORRECT</div>
+        <p>The vtable (virtual function table) is used at runtime. C++ looks at the actual object type, finds the right version, and calls it. Student gets Student's dashboard, Admin gets Admin's dashboard — automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Type</th><th>When decided</th><th>Mechanism</th><th>Example in code</th></tr>
+    <tr><td><strong>Runtime Polymorphism</strong></td><td>At runtime</td><td><code>virtual</code> + base pointer</td><td><code>user->displayDashboard()</code></td></tr>
+    <tr><td><strong>Compile-time Polymorphism</strong></td><td>At compile time</td><td>Function overloading</td><td>Not used here but e.g. same function name, different parameters</td></tr>
+  </table>
+
+  <div class="analogy">
+    <div class="a-label">💡 Real-World Analogy</div>
+    <p>You say "speak!" to a Dog and a Cat (both Animals). The Dog barks; the Cat meows. Same command — different reactions — based on the actual animal type. You don't need to know which animal it is before giving the command.</p>
+  </div>
+</div>
+
+<!-- ════════════════ CONCEPT 5: SMART POINTERS ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n5">5</div>
+    <div class="concept-title">
+      <h2>Smart Pointers — <code>unique_ptr</code></h2>
+      <div class="tagline">Automatic memory management — no manual delete, zero memory leaks</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>A smart pointer is a class that wraps a raw pointer and automatically manages the lifetime of the heap-allocated object. <code>unique_ptr</code> (from <code>&lt;memory&gt;</code>) ensures the object is deleted automatically when the pointer goes out of scope. Only one <code>unique_ptr</code> can own an object at a time.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 180–184 — Smart Pointers</span><span class="badge">unique_ptr</span></div>
+        <pre><span class="cm">// ❌ OLD dangerous way:</span>
+<span class="cls">Assessment</span>* p = <span class="kw">new</span> <span class="cls">PracticeQuiz</span>(<span class="str">"..."</span>);
+<span class="cm">// Must manually delete — easy to forget</span>
+<span class="kw">delete</span> p; <span class="cm">// ← forget this = memory leak</span>
+
+<span class="cm">// ✅ NEW safe way (used in this file):</span>
+<span class="hl">unique_ptr&lt;<span class="cls">Assessment</span>&gt; practice =
+    make_unique&lt;<span class="cls">PracticeQuiz</span>&gt;(
+        <span class="str">"OS Fundamentals (Practice)"</span>
+    );</span>
+<span class="cm">// ↑ Auto-deleted when function ends</span>
+
+practice-&gt;<span class="fn">addQuestion</span>(
+    <span class="cls">Question</span>(<span class="str">"What is a kernel?"</span>,
+             {<span class="str">"Hardware"</span>,<span class="str">"Core OS"</span>,<span class="str">"App"</span>},
+             <span class="num">1</span>)
+);
+
+<span class="hl">unique_ptr&lt;<span class="cls">Assessment</span>&gt; exam =
+    make_unique&lt;<span class="cls">CompetitiveTest</span>&gt;(
+        <span class="str">"OS Fundamentals (Ranked)"</span>, <span class="num">600</span>
+    );</span></pre>
+      </div>
+    </div>
+    <div>
+      <div class="why">
+        <div class="w-label">✅ Why unique_ptr&lt;Assessment&gt; not unique_ptr&lt;PracticeQuiz&gt;?</div>
+        <p>The pointer type is the <strong>base class</strong> <code>Assessment</code>. This allows <strong>polymorphism</strong> — the same variable can hold a <code>PracticeQuiz</code> or a <code>CompetitiveTest</code>. If the type were <code>unique_ptr&lt;PracticeQuiz&gt;</code>, only PracticeQuiz could be stored.</p>
+      </div>
+      <div class="info-card card-blue">
+        <div class="ic-title">→ Arrow Operator</div>
+        <p><code>practice->addQuestion()</code> is shorthand for<br/><code>(*practice).addQuestion()</code>. It dereferences the pointer and accesses the member. Used with all pointers in C++.</p>
+      </div>
+      <div class="info-card card-amber">
+        <div class="ic-title">🔑 Key Rule of unique_ptr</div>
+        <p>You <strong>cannot</strong> copy a <code>unique_ptr</code> — only move it. This enforces single ownership. That's why the function takes a <code>const unique_ptr&lt;Assessment&gt;&</code> (reference, not copy).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Lines 135–138 — Passing unique_ptr by reference</span></div>
+    <pre><span class="kw">void</span> <span class="fn">recordAssessment</span>(<span class="kw">const</span> unique_ptr&lt;<span class="cls">Assessment</span>&gt;&amp; assessment) {
+<span class="hl">    assessment-&gt;<span class="fn">conductAssessment</span>(); <span class="cm">// Calls correct version via polymorphism</span></span>
+    totalScore += assessment-&gt;<span class="fn">getScore</span>();
+    quizzesTaken++;
+}</pre>
+  </div>
+
+  <div class="analogy">
+    <div class="a-label">💡 Real-World Analogy</div>
+    <p>Like a <strong>library book</strong> with an automatic return system. You borrow it (allocate), use it, and when you walk out of the library (scope ends), it automatically goes back to the shelf (memory freed). You never have to remember to return it yourself.</p>
+  </div>
+</div>
+
+<!-- ════════════════ CONCEPT 6: VIRTUAL DESTRUCTOR ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n6">6</div>
+    <div class="concept-title">
+      <h2>Virtual Destructor</h2>
+      <div class="tagline">Ensures proper cleanup of derived class objects when deleted through a base class pointer</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>A virtual destructor ensures that when a derived class object is deleted through a base class pointer, the correct destructor chain executes — first the derived class destructor, then the base class destructor. Without it, only the base destructor runs, causing resource leaks.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Used in all 3 base classes</span><span class="badge">DESTRUCTOR</span></div>
+        <pre><span class="kw">class</span> <span class="cls">IMeasurable</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">virtual</span> ~<span class="fn">IMeasurable</span>() = <span class="kw">default</span>; <span class="cm">// Line 16</span></span>
+};
+
+<span class="kw">class</span> <span class="cls">Assessment</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">virtual</span> ~<span class="fn">Assessment</span>() = <span class="kw">default</span>;  <span class="cm">// Line 68</span></span>
+};
+
+<span class="kw">class</span> <span class="cls">User</span> {
+<span class="kw">public</span>:
+<span class="hl">    <span class="kw">virtual</span> ~<span class="fn">User</span>() = <span class="kw">default</span>;        <span class="cm">// Line 124</span></span>
+};</pre>
+      </div>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Why it matters — example</span></div>
+        <pre><span class="cls">User</span>* u = <span class="kw">new</span> <span class="cls">Student</span>(<span class="str">"U1"</span>,<span class="str">"k@uni"</span>,<span class="str">"K"</span>);
+
+<span class="cm">// WITHOUT virtual destructor:</span>
+<span class="kw">delete</span> u;
+<span class="cm">// → Only User::~User() runs</span>
+<span class="cm">// → Student's variables NOT cleaned!</span>
+<span class="cm">// → MEMORY LEAK 🔴</span>
+
+<span class="cm">// WITH virtual destructor:</span>
+<span class="kw">delete</span> u;
+<span class="cm">// → Student::~Student() runs FIRST</span>
+<span class="cm">// → Then User::~User() runs</span>
+<span class="cm">// → Full cleanup ✅</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card card-dark">
+    <div class="ic-title">= default — What does it mean?</div>
+    <p><code>= default</code> tells the compiler: "generate the default implementation for this function". For destructors, the compiler writes an empty but correct destructor. It's cleaner than writing an empty <code>~ClassName() {}</code> body manually.</p>
+  </div>
+</div>
+
+<!-- ════════════════ CONCEPT 7: INITIALIZER LIST ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n7">7</div>
+    <div class="concept-title">
+      <h2>Constructor Initializer List</h2>
+      <div class="tagline">Efficiently initialize members before the constructor body executes</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">📖 Definition</div>
+    <p>An initializer list appears after the constructor's parameter list, preceded by a colon (<code>:</code>). It directly initializes member variables before the constructor body <code>{}</code> runs. This is more efficient than assigning values inside the body, and is the only way to initialize <code>const</code> members, references, and call parent constructors.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Found throughout the file — key examples</span><span class="badge">INITIALIZER LIST</span></div>
+    <pre><span class="cm">// Question constructor — Lines 30–31</span>
+<span class="fn">Question</span>(string q, vector&lt;string&gt; opts, <span class="num">int</span> correctIndex)
+<span class="hl">    : text(q), options(opts), correctOptionIndex(correctIndex) {} <span class="cm">// All 3 initialized</span></span>
+
+<span class="cm">// Assessment constructor — Lines 53–55</span>
+<span class="fn">Assessment</span>(string t)
+<span class="hl">    : title(t), currentScore(<span class="num">0</span>) {</span>        <span class="cm">// parent members initialized</span>
+    id = <span class="str">"ASSESS_"</span> + to_string(<span class="fn">time</span>(<span class="num">0</span>)); <span class="cm">// id set in body (needs function call)</span>
+}
+
+<span class="cm">// CompetitiveTest — Lines 92 — calls BOTH parent + own initializer</span>
+<span class="fn">CompetitiveTest</span>(string t, <span class="num">int</span> timeLimit)
+<span class="hl">    : <span class="fn">Assessment</span>(t),              <span class="cm">// ← calls parent constructor</span>
+      timeLimitSeconds(timeLimit) {} <span class="cm">// ← initializes own member</span></span>
+
+<span class="cm">// Student — Line 133</span>
+<span class="fn">Student</span>(string id, string e, string n)
+<span class="hl">    : <span class="fn">User</span>(id, e, n),            <span class="cm">// ← passes to parent</span>
+      totalScore(<span class="num">0</span>), quizzesTaken(<span class="num">0</span>) {}</span></pre>
+  </div>
+
+  <div class="two-col">
+    <div class="why">
+      <div class="w-label">✅ Why initializer list instead of assignment in body</div>
+      <p>When you assign inside the body, the member is first <em>default-constructed</em>, then overwritten — two operations. With an initializer list, the member is <em>directly constructed</em> with the value — one operation. For complex objects this makes a real performance difference.</p>
+    </div>
+    <div class="info-card card-blue">
+      <div class="ic-title">Order of Initialization</div>
+      <p>Members are always initialized in the order they are <strong>declared in the class</strong>, not in the order of the initializer list. The parent constructor always runs before the child's members are initialized.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ SUMMARY TABLE ════════════════ -->
+<div class="summary-page">
+  <div class="summary-header">
+    <h2>Complete OOP Summary</h2>
+    <p>Every concept, where it appears, definition, and why it was used — at a glance</p>
+  </div>
+
+  <table class="summary-table">
+    <tr>
+      <th>Concept</th>
+      <th>Where in Code</th>
+      <th>One-Line Definition</th>
+      <th>Why Used in Quizzify</th>
+    </tr>
+    <tr>
+      <td><span class="tag tag-enc">Encapsulation</span></td>
+      <td><code>class Question</code><br/>Lines 23–39</td>
+      <td>Bundling data + methods; restricting direct access via <code>private</code></td>
+      <td>Hide the correct answer index — only <code>checkAnswer()</code> is exposed, preventing cheating</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-abs">Abstraction</span></td>
+      <td><code>IMeasurable</code> (L13)<br/><code>Assessment</code> (L45)<br/><code>conductAssessment()=0</code></td>
+      <td>Defining <em>what</em> must exist without specifying <em>how</em> via pure virtual functions</td>
+      <td>Forces every quiz type to implement its own conduct logic; <code>Assessment</code> cannot be mistakenly instantiated directly</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-inh">Inheritance</span></td>
+      <td><code>PracticeQuiz : Assessment</code> (L72)<br/><code>CompetitiveTest : Assessment</code> (L87)<br/><code>Student : User</code> (L127)<br/><code>Admin : User</code> (L150)</td>
+      <td>Child class acquires all properties of parent class for free via <code>:</code></td>
+      <td>Both quiz types share <code>title</code>, <code>questions</code>, <code>addQuestion()</code>, <code>getScore()</code> without rewriting. <code>Student</code> and <code>Admin</code> share <code>userId</code>, <code>email</code>, <code>name</code></td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-pol">Polymorphism</span></td>
+      <td><code>vector&lt;User*&gt;</code> (L172)<br/><code>user->displayDashboard()</code> (L194)<br/><code>virtual</code> keyword (L118)</td>
+      <td>Same function name, different behaviour based on actual runtime type via virtual dispatch</td>
+      <td>One loop processes both Students and Admins. Each gets their own dashboard output. No <code>if/else</code> type-checking needed</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-spt">Smart Pointers</span></td>
+      <td><code>unique_ptr&lt;Assessment&gt;</code> (L180, L183)<br/><code>make_unique&lt;&gt;()</code></td>
+      <td>Wrapper that auto-deletes heap memory when it goes out of scope; no manual <code>delete</code></td>
+      <td>Prevents memory leaks when switching between PracticeQuiz and CompetitiveTest; enables polymorphism via base class pointer type</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-enc">Virtual Destructor</span></td>
+      <td><code>virtual ~IMeasurable()</code> (L16)<br/><code>virtual ~Assessment()</code> (L68)<br/><code>virtual ~User()</code> (L124)</td>
+      <td>Ensures the full destructor chain runs when deleting a derived object via base pointer</td>
+      <td>Without this, deleting a <code>Student</code> via <code>User*</code> would skip <code>Student</code>'s destructor — memory leak</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-inh">Initializer List</span></td>
+      <td>All constructors — <code>: base(args), member(val)</code><br/>Lines 31, 54, 92, 116, 133, 152</td>
+      <td>Directly initializes members before constructor body; calls parent constructor</td>
+      <td>More efficient than assignment in body; required to call parent constructors and chain initialization in the hierarchy</td>
+    </tr>
+  </table>
+
+  <div style="margin-top:40px;background:linear-gradient(135deg,#0f0c29,#302b63);border-radius:16px;padding:30px;text-align:center;">
+    <p style="color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Viva Killer Line</p>
+    <p style="color:#fff;font-size:16px;font-weight:600;line-height:1.7;max-width:700px;margin:0 auto;">"The C++ file demonstrates all four pillars of OOP. <span style="color:#4facfe">Encapsulation</span> hides the answer in <code>Question</code>. <span style="color:#f093fb">Abstraction</span> makes <code>Assessment</code> a blueprint. <span style="color:#a5d6ff">Inheritance</span> lets quiz types share common structure. <span style="color:#43e97b">Polymorphism</span> lets a single loop handle both Students and Admins correctly — all enabled by the <code>virtual</code> keyword and smart pointer memory management."</p>
+  </div>
+</div>
+
+
+<!-- ════════════════ FRONTEND DIVIDER ════════════════ -->
+<div class="cover" style="page-break-before:always;">
+  <div class="cover-badge">Part 2 — Web Application</div>
+  <h1>Frontend Code<br/><span>Next.js + React</span></h1>
+  <p class="cover-sub">A complete explanation of every page, component, API route, and the auth + database flow that powers the live Quizzify AI website.</p>
+  <div class="cover-meta">
+    <div><div class="label">Framework</div><div class="value">Next.js 16</div></div>
+    <div><div class="label">UI Library</div><div class="value">React 19</div></div>
+    <div><div class="label">Styling</div><div class="value">Tailwind CSS</div></div>
+    <div><div class="label">Language</div><div class="value">TypeScript</div></div>
+  </div>
+  <div class="cover-concepts" style="margin-top:30px;">
+    <span>5 Pages</span><span>7 Components</span><span>3 API Routes</span>
+    <span>NextAuth.js</span><span>Prisma ORM</span><span>Gemini AI</span>
+  </div>
+</div>
+
+<!-- ════════════════ ARCHITECTURE OVERVIEW ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n1">📁</div>
+    <div class="concept-title">
+      <h2>Project Architecture</h2>
+      <div class="tagline">How the folders are organised and which file does what</div>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <div class="d-label">Full Folder Structure</div>
+src/
+├── app/                        ← Next.js App Router (folder = URL route)
+│   ├── layout.tsx              ← Root HTML shell — wraps EVERY page
+│   ├── globals.css             ← Dark theme, glass effects, brand colours
+│   ├── page.tsx                ← Landing page  →  URL: /
+│   ├── login/page.tsx          ← Login + Register  →  URL: /login
+│   ├── forge/page.tsx          ← PDF upload + quiz  →  URL: /forge
+│   ├── dashboard/page.tsx      ← User stats  →  URL: /dashboard
+│   ├── leaderboard/page.tsx    ← Rankings  →  URL: /leaderboard
+│   └── api/                    ← Backend API routes (server-side)
+│       ├── auth/
+│       │   ├── [...nextauth]/  ← Handles ALL NextAuth requests
+│       │   └── register/       ← POST: create new account
+│       ├── generate/route.ts   ← POST: call Gemini AI → return questions
+│       └── results/route.ts    ← POST: save quiz result to database
+├── components/                 ← Reusable UI pieces shared across pages
+│   ├── TopNav.tsx              ← Sticky navigation bar
+│   ├── LogoutButton.tsx        ← Sign-out button (client-side)
+│   ├── ModeToggle.tsx          ← Practice vs Test mode selector
+│   ├── UploadBox.tsx           ← Drag-and-drop file upload
+│   ├── QuizCard.tsx            ← Single question card
+│   ├── ResultScreen.tsx        ← End-of-quiz score display
+│   └── Timer.tsx               ← Countdown timer
+└── lib/                        ← Shared backend utilities
+    ├── nextauth.ts             ← Auth configuration (providers, JWT, callbacks)
+    ├── prisma.ts               ← Database client singleton
+    └── canvas-mock.ts          ← Safari PDF polyfill
+  </div>
+
+  <div class="two-col">
+    <div class="info-card card-blue">
+      <div class="ic-title">Server Components vs Client Components</div>
+      <p>Files without <code>"use client"</code> at the top run on the <strong>server</strong> — they can query the database directly and never expose secrets to the browser.<br/><br/>Files with <code>"use client"</code> run in the <strong>browser</strong> — they can use <code>useState</code>, event handlers, and animations.</p>
+    </div>
+    <div class="info-card card-purple">
+      <div class="ic-title">How Routing Works in Next.js App Router</div>
+      <p>The <strong>folder name = the URL path</strong>. A file named <code>page.tsx</code> inside a folder is what gets rendered at that URL.<br/><br/><code>src/app/forge/page.tsx</code> → shown at <code>/forge</code><br/><code>src/app/dashboard/page.tsx</code> → shown at <code>/dashboard</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ LAYOUT.TSX ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n2">🏗️</div>
+    <div class="concept-title">
+      <h2>layout.tsx — The Root Shell</h2>
+      <div class="tagline">The HTML wrapper that surrounds every single page on the website</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/app/layout.tsx</span><span class="badge">SERVER COMPONENT</span></div>
+    <pre><span class="kw">import</span> type { Metadata } <span class="kw">from</span> <span class="str">'next'</span>
+<span class="kw">import</span> { Inter } <span class="kw">from</span> <span class="str">'next/font/google'</span>   <span class="cm">// Google Font</span>
+<span class="kw">import</span> <span class="str">'./globals.css'</span>
+<span class="kw">import</span> TopNav <span class="kw">from</span> <span class="str">'@/components/TopNav'</span>
+
+<span class="kw">const</span> inter = <span class="fn">Inter</span>({ subsets: [<span class="str">'latin'</span>] })
+
+<span class="hl"><span class="kw">export const</span> metadata: Metadata = {
+  title: <span class="str">'Quizzify AI'</span>,             <span class="cm">// Browser tab title</span>
+  description: <span class="str">'Turn PDFs into interactive quizzes instantly.'</span>,
+  icons: { icon: <span class="str">'/logo.png'</span> },    <span class="cm">// Favicon</span>
+}</span>
+
+<span class="kw">export default function</span> <span class="fn">RootLayout</span>({ children }) {
+  <span class="kw">return</span> (
+    &lt;html lang=<span class="str">"en"</span> className=<span class="str">"bg-[#09090b] overscroll-none"</span>&gt;
+<span class="hl">      &lt;body className={<span class="str">`${inter.className} pb-20 md:pb-0`</span>}&gt;
+        &lt;TopNav /&gt;         <span class="cm">// Nav rendered ONCE, appears on all pages</span>
+        {children}         <span class="cm">// Each page renders here</span>
+      &lt;/body&gt;</span>
+    &lt;/html&gt;
+  )
+}</pre>
+  </div>
+
+  <table>
+    <tr><th>Code Part</th><th>What it Does</th></tr>
+    <tr><td><code>bg-[#09090b]</code></td><td>Sets the deep near-black background for the entire site</td></tr>
+    <tr><td><code>overscroll-none</code></td><td>Removes the rubbery scroll-bounce on mobile Safari</td></tr>
+    <tr><td><code>pb-20 md:pb-0</code></td><td>Adds bottom padding on mobile for the floating bottom nav bar; none on desktop</td></tr>
+    <tr><td><code>Inter</code> font</td><td>Loads the premium Inter typeface from Google Fonts instead of browser defaults</td></tr>
+    <tr><td><code>metadata</code></td><td>Sets SEO title and description — appears in Google search results</td></tr>
+    <tr><td><code>&lt;TopNav /&gt;</code></td><td>Navigation bar component — defined once here, automatically appears on EVERY page</td></tr>
+    <tr><td><code>{children}</code></td><td>React prop — whatever page is currently being visited renders in this slot</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════ LANDING PAGE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n3">🏠</div>
+    <div class="concept-title">
+      <h2>page.tsx — Landing Page</h2>
+      <div class="tagline">The homepage at / — server-rendered, checks login status, shows feature grid</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">Type: Async Server Component (no "use client")</div>
+    <p>This page runs entirely on the server. It checks your session before sending HTML to the browser — so the "Start Forging" button already knows whether to send you to <code>/login</code> or <code>/dashboard</code>.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/app/page.tsx — Key Logic</span><span class="badge">SERVER</span></div>
+    <pre><span class="kw">export default async function</span> <span class="fn">LandingPage</span>() {
+<span class="hl">  <span class="kw">const</span> session = <span class="kw">await</span> <span class="fn">getServerSession</span>(authOptions);  <span class="cm">// Read JWT cookie on server</span>
+  <span class="kw">const</span> isLoggedIn = !!session;                         <span class="cm">// true if logged in</span></span>
+
+  <span class="kw">return</span> (
+    &lt;div&gt;
+      <span class="cm">// Hero headline with gradient text</span>
+      &lt;h1&gt;Master any subject. In seconds.&lt;/h1&gt;
+
+<span class="hl">      <span class="cm">// Button changes destination based on login state</span>
+      &lt;Link href={isLoggedIn ? <span class="str">"/dashboard"</span> : <span class="str">"/login"</span>}&gt;
+        Start Forging
+      &lt;/Link&gt;</span>
+
+      <span class="cm">// 3 feature cards: Instant Generation, Adaptive Insights, Leaderboard</span>
+      &lt;div className=<span class="str">"grid md:grid-cols-3 gap-8"</span>&gt;
+        &lt;div className=<span class="str">"glass-effect p-8 rounded-3xl"</span>&gt;...&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+  </div>
+
+  <div class="two-col">
+    <div class="why">
+      <div class="w-label">✅ Why Server-Side Here</div>
+      <p>Checking session on the server means the correct button label is baked into the HTML — no flash of wrong content. If it were client-side, the button would first render with "Sign In" then jump to "Go to Dashboard" after the JS loads.</p>
+    </div>
+    <div class="analogy">
+      <div class="a-label">💡 glass-effect Class</div>
+      <p>The feature cards use <code>glass-effect</code> — a Tailwind utility defined in <code>globals.css</code> that gives a semi-transparent frosted glass appearance: <code>bg-white/5 backdrop-blur-xl border border-white/10</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ FORGE PAGE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n4">⚡</div>
+    <div class="concept-title">
+      <h2>forge/page.tsx — The Quiz Engine</h2>
+      <div class="tagline">The most complex file (331 lines) — manages the entire quiz lifecycle from upload to results</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">Type: Client Component ("use client" at top) — 331 lines</div>
+    <p>Runs in the browser. Manages all state (file, questions, answers, mode, timer) and orchestrates every step: extract text → call AI → show quiz → save results.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/app/forge/page.tsx — State Variables</span><span class="badge">CLIENT</span></div>
+    <pre><span class="cm">// Every piece of data the page tracks:</span>
+<span class="kw">const</span> [file, setFile] = <span class="fn">useState</span>&lt;File | null&gt;(<span class="kw">null</span>);
+<span class="kw">const</span> [loading, setLoading] = <span class="fn">useState</span>(<span class="kw">false</span>);
+<span class="kw">const</span> [mode, setMode] = <span class="fn">useState</span>&lt;<span class="str">'practice'</span> | <span class="str">'test'</span>&gt;(<span class="str">'practice'</span>);
+<span class="kw">const</span> [useTimer, setUseTimer] = <span class="fn">useState</span>(<span class="kw">false</span>);
+<span class="kw">const</span> [timerLength, setTimerLength] = <span class="fn">useState</span>(<span class="num">600</span>);         <span class="cm">// 10 mins default</span>
+<span class="kw">const</span> [questionCount, setQuestionCount] = <span class="fn">useState</span>(<span class="num">5</span>);
+<span class="kw">const</span> [difficulty, setDifficulty] = <span class="fn">useState</span>(<span class="str">'medium'</span>);
+<span class="hl"><span class="kw">const</span> [questions, setQuestions] = <span class="fn">useState</span>&lt;Question[] | null&gt;(<span class="kw">null</span>);  <span class="cm">// AI output</span>
+<span class="kw">const</span> [answers, setAnswers] = <span class="fn">useState</span>&lt;Record&lt;number, string&gt;&gt;({});   <span class="cm">// User's picks</span>
+<span class="kw">const</span> [quizFinished, setQuizFinished] = <span class="fn">useState</span>(<span class="kw">false</span>);</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">The 3 UI States — conditional rendering</span><span class="badge">REACT PATTERN</span></div>
+    <pre><span class="cm">// State 1: Setup — show upload box and mode selector</span>
+<span class="hl">{!questions && !quizFinished && (  &lt;UploadBox .../&gt;  )}</span>
+
+<span class="cm">// State 2: Active Quiz — show question cards</span>
+<span class="hl">{questions && !quizFinished && (  &lt;QuizCard .../&gt;  )}</span>
+
+<span class="cm">// State 3: Done — show results + question review</span>
+<span class="hl">{quizFinished && questions && (  &lt;ResultScreen .../&gt;  )}</span>
+
+<span class="cm">// AnimatePresence from Framer Motion smoothly transitions between states</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">PDF Extraction — runs in browser, NOT server</span><span class="badge">KEY CONCEPT</span></div>
+    <pre><span class="kw">const</span> <span class="fn">extractTextFromPdf</span> = <span class="kw">async</span> (file: File) => {
+  <span class="kw">const</span> pdfjsLib = <span class="kw">await</span> <span class="fn">import</span>(<span class="str">'pdfjs-dist'</span>);        <span class="cm">// Dynamic import</span>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    <span class="str">`https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`</span>;
+
+<span class="hl">  <span class="kw">const</span> arrayBuffer = <span class="kw">await</span> file.<span class="fn">arrayBuffer</span>();       <span class="cm">// Read file as bytes</span>
+  <span class="kw">const</span> pdf = <span class="kw">await</span> pdfjsLib.<span class="fn">getDocument</span>({ data: <span class="kw">new</span> <span class="fn">Uint8Array</span>(arrayBuffer) }).promise;</span>
+
+  <span class="kw">let</span> fullText = <span class="str">""</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i &lt;= pdf.numPages; i++) {
+    <span class="kw">const</span> page = <span class="kw">await</span> pdf.<span class="fn">getPage</span>(i);
+    <span class="kw">const</span> textContent = <span class="kw">await</span> page.<span class="fn">getTextContent</span>();
+    fullText += textContent.items.<span class="fn">map</span>((item: any) =&gt; item.str).<span class="fn">join</span>(<span class="str">" "</span>) + <span class="str">"\n"</span>;
+  }
+  <span class="kw">return</span> fullText;   <span class="cm">// Just text — much smaller than the PDF binary</span>
+};</pre>
+  </div>
+
+  <div class="info-card card-amber">
+    <div class="ic-title">⚠️ Why PDF is Parsed in the Browser (Critical Viva Question)</div>
+    <p>Vercel (the hosting platform) has a <strong>4.5 MB body size limit</strong> for API requests. A PDF can be 10–70 MB. If we sent the raw PDF to the server, it would be rejected. By extracting just the text in the browser first, we only send a small string (~50 KB) to the API — well within limits.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">submitTest() — saves score to database</span></div>
+    <pre><span class="kw">const</span> <span class="fn">submitTest</span> = <span class="kw">async</span> () =&gt; {
+  <span class="fn">setQuizFinished</span>(<span class="kw">true</span>);          <span class="cm">// Show results immediately</span>
+
+<span class="hl">  <span class="cm">// Fire-and-forget — don't block UI on DB save</span>
+  <span class="fn">fetch</span>(<span class="str">'/api/results'</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+    body: <span class="fn">JSON.stringify</span>({
+      score: <span class="fn">calculateScore</span>(),
+      total: questions.length,
+      mode, difficulty,
+      weakTopics: <span class="fn">extractWeakTopics</span>()
+    })
+  }).<span class="fn">catch</span>(console.error);  <span class="cm">// ← .catch means: if DB fails, don't crash the page</span></span>
+};</pre>
+  </div>
+</div>
+
+<!-- ════════════════ DASHBOARD PAGE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n5">📊</div>
+    <div class="concept-title">
+      <h2>dashboard/page.tsx — User Stats</h2>
+      <div class="tagline">Server-rendered page that queries the database and shows score, history, and weak topics</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/app/dashboard/page.tsx</span><span class="badge">SERVER</span></div>
+    <pre><span class="kw">export default async function</span> <span class="fn">DashboardPage</span>() {
+  <span class="kw">const</span> session = <span class="kw">await</span> <span class="fn">getServerSession</span>(authOptions);
+  <span class="kw">const</span> userId = (session?.user <span class="kw">as any</span>)?.id;
+
+<span class="hl">  <span class="kw">if</span> (!userId) <span class="fn">redirect</span>(<span class="str">"/login"</span>);    <span class="cm">// Guard: not logged in → send to login</span></span>
+
+  <span class="cm">// Query DB: get user + their last 5 quizzes</span>
+  <span class="kw">const</span> user = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({
+    where: { id: userId },
+    include: { quizzes: { orderBy: { createdAt: <span class="str">"desc"</span> }, take: <span class="num">5</span> } },
+  });
+
+  <span class="cm">// Weak topics algorithm:</span>
+<span class="hl">  <span class="kw">const</span> allTopicsRaw = user.quizzes.<span class="fn">flatMap</span>(q =&gt; <span class="fn">JSON.parse</span>(q.weakTopics || <span class="str">"[]"</span>));
+  <span class="cm">// ["Photosynthesis", "Mitosis", "Photosynthesis"] → count each</span>
+
+  <span class="kw">const</span> topicCounts = allTopicsRaw.<span class="fn">reduce</span>((acc, t) =&gt; {
+    acc[t] = (acc[t] || <span class="num">0</span>) + <span class="num">1</span>;   <span class="cm">// {"Photosynthesis": 2, "Mitosis": 1}</span>
+    <span class="kw">return</span> acc;
+  }, {});
+
+  <span class="kw">const</span> sortedWeakTopics = Object.<span class="fn">entries</span>(topicCounts)
+    .<span class="fn">sort</span>((a, b) =&gt; b[<span class="num">1</span>] - a[<span class="num">1</span>])   <span class="cm">// Sort by frequency</span>
+    .<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">5</span>)                    <span class="cm">// Top 5 only</span>
+    .<span class="fn">map</span>(entry =&gt; entry[<span class="num">0</span>]);</span>       <span class="cm">// Just the topic name</span>
+}</pre>
+  </div>
+
+  <div class="two-col">
+    <div class="info-card card-green">
+      <div class="ic-title">Three stat cards shown:</div>
+      <p>1. <strong>Total Score</strong> — from <code>user.totalScore</code> in DB<br/>
+      2. <strong>Quizzes Taken</strong> — from <code>user.quizzesTaken</code><br/>
+      3. <strong>Weak Topics</strong> — computed by the algorithm above — shows the 5 topics you get wrong most often</p>
+    </div>
+    <div class="info-card card-blue">
+      <div class="ic-title">flatMap() Explained</div>
+      <p><code>flatMap()</code> maps each quiz to its weak topics array, then flattens all those arrays into one big list.<br/><br/>Without flat: <code>[["A","B"], ["A","C"]]</code><br/>With flatMap: <code>["A","B","A","C"]</code><br/>Then reduce counts each occurrence.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ LEADERBOARD PAGE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n6">🏆</div>
+    <div class="concept-title">
+      <h2>leaderboard/page.tsx — Global Rankings</h2>
+      <div class="tagline">Always-fresh server page showing top 50 users ordered by total score</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/app/leaderboard/page.tsx</span><span class="badge">SERVER + FORCE-DYNAMIC</span></div>
+    <pre><span class="hl"><span class="kw">export const</span> dynamic = <span class="str">"force-dynamic"</span>;  <span class="cm">// NEVER cache this page</span></span>
+
+<span class="kw">export default async function</span> <span class="fn">LeaderboardPage</span>() {
+  <span class="kw">const</span> users = <span class="kw">await</span> prisma.user.<span class="fn">findMany</span>({
+    where: {
+<span class="hl">      NOT: { name: { equals: <span class="str">'chutia'</span>, mode: <span class="str">'insensitive'</span> } }  <span class="cm">// Filter blocked users</span></span>
+    },
+    orderBy: { totalScore: <span class="str">'desc'</span> },   <span class="cm">// Highest first</span>
+    take: <span class="num">50</span>                              <span class="cm">// Max 50 entries</span>
+  });
+
+  <span class="cm">// Rank display: gold/silver/bronze for top 3</span>
+  {idx === <span class="num">0</span> && &lt;span className=<span class="str">"text-yellow-400"</span>&gt;<span class="str">1st</span>&lt;/span&gt;}
+  {idx === <span class="num">1</span> && &lt;span className=<span class="str">"text-zinc-300"</span>&gt;<span class="str">2nd</span>&lt;/span&gt;}
+  {idx === <span class="num">2</span> && &lt;span className=<span class="str">"text-amber-600"</span>&gt;<span class="str">3rd</span>&lt;/span&gt;}
+  {idx &gt;  <span class="num">2</span> && &lt;span className=<span class="str">"text-zinc-500"</span>&gt;<span class="str">#{idx+1}</span>&lt;/span&gt;}
+}</pre>
+  </div>
+
+  <div class="info-card card-red">
+    <div class="ic-title">Why "force-dynamic"?</div>
+    <p>By default, Next.js caches server pages. Without <code>force-dynamic</code>, a user's score would update in the database but the leaderboard would still show old data. This directive tells Next.js: <strong>always re-query on every request</strong> — guaranteeing live, accurate rankings.</p>
+  </div>
+</div>
+
+<!-- ════════════════ LOGIN PAGE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n7">🔐</div>
+    <div class="concept-title">
+      <h2>login/page.tsx — Login & Registration</h2>
+      <div class="tagline">Client component handling both Google OAuth and email/password in one page</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Google Sign-In</span><span class="badge">OAUTH</span></div>
+        <pre><span class="kw">const</span> <span class="fn">handleGoogleSignIn</span> = <span class="kw">async</span> () =&gt; {
+<span class="hl">  <span class="kw">await</span> <span class="fn">signIn</span>(<span class="str">'google'</span>, {
+    callbackUrl: <span class="str">'/dashboard'</span>
+  });</span>
+  <span class="cm">// Redirects to Google → user picks account</span>
+  <span class="cm">// → Google sends token back → NextAuth</span>
+  <span class="cm">// auto-creates user in DB if new</span>
+  <span class="cm">// → redirected to /dashboard</span>
+};</pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Email Registration Flow</span><span class="badge">CREDENTIALS</span></div>
+        <pre><span class="cm">// Step 1: Create account in DB</span>
+<span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/auth/register'</span>, {
+    method: <span class="str">'POST'</span>,
+    body: <span class="fn">JSON.stringify</span>(form)
+});
+
+<span class="cm">// Step 2: Immediately sign in</span>
+<span class="hl"><span class="kw">await</span> <span class="fn">signIn</span>(<span class="str">'credentials'</span>, {
+    redirect: <span class="kw">false</span>,   <span class="cm">// ← CRITICAL</span>
+    email: form.email,
+    password: form.password
+});</span>
+<span class="cm">// redirect:false lets us catch errors</span>
+<span class="cm">// without a page jump</span>
+
+<span class="cm">// Step 3: Navigate to dashboard</span>
+router.<span class="fn">push</span>(<span class="str">'/dashboard'</span>);</pre>
+      </div>
+    </div>
+    <div>
+      <div class="why">
+        <div class="w-label">✅ Both Login + Register in One Page</div>
+        <p>A single boolean state <code>isRegistering</code> toggles between the two modes. Clicking "Register Here" just flips this boolean — no page navigation needed. This creates a smooth user experience.</p>
+      </div>
+      <div class="info-card card-purple">
+        <div class="ic-title">Why redirect: false?</div>
+        <p>Without it, <code>signIn()</code> does a full browser redirect. That means if there's an error (wrong password), you get sent to NextAuth's error page with no user-friendly message. With <code>redirect: false</code>, signIn returns a result object — we can read the error and show it in the UI ourselves.</p>
+      </div>
+      <div class="info-card card-amber">
+        <div class="ic-title">isRegistering Toggle</div>
+        <p>The same <code>&lt;form&gt;</code> conditionally shows a "Full Name" field only when <code>isRegistering === true</code>. The submit button text also changes: "Create Account" vs "Sign In". One component, two modes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ COMPONENTS ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n1">🧩</div>
+    <div class="concept-title">
+      <h2>Components — Reusable UI Pieces</h2>
+      <div class="tagline">7 components that are imported and used across multiple pages</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Component</th><th>Type</th><th>Purpose</th><th>Key Feature</th></tr>
+    <tr><td><code>TopNav.tsx</code></td><td>Server</td><td>Sticky navigation bar</td><td>Reads session on server; mobile nav becomes fixed bottom bar</td></tr>
+    <tr><td><code>LogoutButton.tsx</code></td><td>Client</td><td>Sign-out button</td><td>Must be client-side because <code>signOut()</code> is a browser function</td></tr>
+    <tr><td><code>ModeToggle.tsx</code></td><td>Client</td><td>Practice vs Test selector</td><td>Two-button toggle that lifts state to forge page</td></tr>
+    <tr><td><code>UploadBox.tsx</code></td><td>Client</td><td>File drag-and-drop</td><td>Handles PDF/PPTX/TXT, 70MB limit, drag events, hidden input trick</td></tr>
+    <tr><td><code>QuizCard.tsx</code></td><td>Client</td><td>Single MCQ question</td><td>Practice: shows right/wrong immediately. Test: locks until submit</td></tr>
+    <tr><td><code>ResultScreen.tsx</code></td><td>Client</td><td>End-of-quiz score display</td><td>Animated progress bar, dynamic message, weak topics list</td></tr>
+    <tr><td><code>Timer.tsx</code></td><td>Client</td><td>Countdown clock</td><td>useEffect interval, turns red + pulses under 60 seconds</td></tr>
+  </table>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">UploadBox.tsx — Hidden Input Trick</span><span class="badge">KEY TRICK</span></div>
+        <pre><span class="cm">// Hidden file input — clicking zone triggers it</span>
+<span class="kw">const</span> inputRef = <span class="fn">useRef</span>&lt;HTMLInputElement&gt;(<span class="kw">null</span>);
+
+<span class="kw">const</span> <span class="fn">handleZoneClick</span> = () =&gt; {
+<span class="hl">  inputRef.current?.<span class="fn">click</span>();  <span class="cm">// Programmatically open file picker</span></span>
+};
+
+<span class="cm">// The input itself is invisible</span>
+&lt;input ref={inputRef} type=<span class="str">"file"</span> className=<span class="str">"hidden"</span> /&gt;
+
+<span class="cm">// Clicking ANYWHERE on the zone triggers it</span>
+&lt;div onClick={handleZoneClick}&gt;
+  Drop file here or click to upload
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">Timer.tsx — useEffect Countdown</span><span class="badge">HOOK</span></div>
+        <pre><span class="kw">const</span> [timeLeft, setTimeLeft] = <span class="fn">useState</span>(durationSeconds);
+
+<span class="hl"><span class="fn">useEffect</span>(() =&gt; {
+  <span class="kw">if</span> (!isActive) <span class="kw">return</span>;
+  <span class="kw">if</span> (timeLeft &lt;= <span class="num">0</span>) { <span class="fn">onTimeUp</span>(); <span class="kw">return</span>; }
+
+  <span class="kw">const</span> timer = <span class="fn">setInterval</span>(
+    () =&gt; <span class="fn">setTimeLeft</span>(t =&gt; t - <span class="num">1</span>), <span class="num">1000</span>
+  );
+  <span class="kw">return</span> () =&gt; <span class="fn">clearInterval</span>(timer); <span class="cm">// Cleanup!</span>
+}, [timeLeft, onTimeUp, isActive]);</span>
+
+<span class="cm">// Red + pulsing when under 60 seconds:</span>
+className={timeLeft &lt; <span class="num">60</span> ? <span class="str">'text-red-400 animate-pulse'</span> : <span class="str">'text-white'</span>}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">QuizCard.tsx — Practice vs Test Mode Logic</span><span class="badge">COMPONENT</span></div>
+    <pre><span class="cm">// Practice mode: show correct/wrong the moment user picks an answer</span>
+<span class="cm">// Test mode: lock everything, only show corrections after submit</span>
+<span class="hl"><span class="kw">const</span> isVerified = (isPrac && selectedOption !== <span class="kw">null</span>) || showCorrections;</span>
+
+<span class="cm">// Dynamic button colour based on state:</span>
+<span class="kw">if</span> (isVerified) {
+  <span class="kw">if</span> (isCorrect)  btnState = <span class="str">"border-emerald-500 bg-emerald-500/10"</span>; <span class="cm">// ✅ Green</span>
+  <span class="kw">if</span> (isSelected && !isCorrect) btnState = <span class="str">"border-red-500 bg-red-500/10"</span>; <span class="cm">// ❌ Red</span>
+} <span class="kw">else if</span> (isSelected) {
+  btnState = <span class="str">"border-primary bg-primary/20"</span>; <span class="cm">// 🔵 Blue (pending, not yet judged)</span>
+}
+
+<span class="hl">&lt;button disabled={isVerified}&gt;  <span class="cm">// Lock answer once judged</span></span></pre>
+  </div>
+</div>
+
+<!-- ════════════════ API ROUTES ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n2">🔌</div>
+    <div class="concept-title">
+      <h2>API Routes — The Backend Logic</h2>
+      <div class="tagline">Next.js server functions that handle AI calls, database writes, and user registration</div>
+    </div>
+  </div>
+
+  <div class="definition">
+    <div class="def-label">What is an API Route in Next.js?</div>
+    <p>A file named <code>route.ts</code> inside <code>src/app/api/</code> becomes a server-side HTTP endpoint. When the frontend calls <code>fetch('/api/generate')</code>, this file's <code>POST</code> function runs on the server — it has access to environment variables, the database, and secret API keys that never reach the browser.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">api/generate/route.ts — Gemini AI Call</span><span class="badge">AI ROUTE</span></div>
+    <pre><span class="kw">export async function</span> <span class="fn">POST</span>(req: Request) {
+<span class="hl">  <span class="cm">// 1. Auth guard — Gemini is locked behind login</span>
+  <span class="kw">const</span> session = <span class="kw">await</span> <span class="fn">getServerSession</span>(authOptions);
+  <span class="kw">if</span> (!session) <span class="kw">return</span> NextResponse.<span class="fn">json</span>({ error: <span class="str">"Unauthorized"</span> }, { status: <span class="num">401</span> });</span>
+
+  <span class="cm">// 2. Read the form data sent from the browser</span>
+  <span class="kw">const</span> formData = <span class="kw">await</span> req.<span class="fn">formData</span>();
+  <span class="kw">const</span> extractedText = formData.<span class="fn">get</span>(<span class="str">"text"</span>);          <span class="cm">// PDF text</span>
+  <span class="kw">const</span> count = <span class="fn">parseInt</span>(formData.<span class="fn">get</span>(<span class="str">"count"</span>) || <span class="str">"5"</span>);  <span class="cm">// Question count</span>
+  <span class="kw">const</span> difficulty = formData.<span class="fn">get</span>(<span class="str">"difficulty"</span>);       <span class="cm">// easy/medium/hard/mixed</span>
+
+  <span class="cm">// 3. Build and call Gemini API</span>
+  <span class="kw">const</span> genAI = <span class="kw">new</span> <span class="fn">GoogleGenerativeAI</span>(process.env.GEMINI_API_KEY);
+  <span class="kw">const</span> model = genAI.<span class="fn">getGenerativeModel</span>({ model: <span class="str">"gemini-2.5-flash"</span> });
+
+<span class="hl">  <span class="kw">const</span> prompt = <span class="str">`Generate exactly ${count} MCQs at ${difficulty} difficulty.
+Output ONLY as raw JSON array: [{"question","options","answer","topic"}]
+--- Source Text ---
+${extractedText.slice(0, 30000)}`</span>;  <span class="cm">// Slice to stay within token limit</span>
+
+  <span class="kw">const</span> result = <span class="kw">await</span> model.<span class="fn">generateContent</span>({ contents: [{ role: <span class="str">"user"</span>, parts: [{ text: prompt }] }] });
+
+  <span class="cm">// 4. Clean any markdown wrappers Gemini might add</span>
+<span class="hl">  <span class="kw">const</span> cleanedText = responseText.<span class="fn">replace</span>(<span class="str">/```json/g</span>, <span class="str">""</span>).<span class="fn">replace</span>(<span class="str">/```/g</span>, <span class="str">""</span>).<span class="fn">trim</span>();
+  <span class="kw">const</span> questions = <span class="fn">JSON.parse</span>(cleanedText);  <span class="cm">// Parse JSON string → JS array</span></span>
+
+  <span class="kw">return</span> NextResponse.<span class="fn">json</span>({ questions });
+}</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">api/results/route.ts — Save to Database</span><span class="badge">DB ROUTE</span></div>
+    <pre><span class="kw">export async function</span> <span class="fn">POST</span>(req: Request) {
+  <span class="kw">const</span> { score, total, mode, difficulty, weakTopics } = <span class="kw">await</span> req.<span class="fn">json</span>();
+  <span class="kw">const</span> percentage = Math.<span class="fn">round</span>((score / total) * <span class="num">100</span>);
+
+  <span class="cm">// Create quiz record</span>
+  <span class="kw">await</span> prisma.quiz.<span class="fn">create</span>({
+    data: { userId, score, total, percentage, mode, difficulty,
+<span class="hl">            weakTopics: <span class="fn">JSON.stringify</span>(weakTopics || []) }  <span class="cm">// Store as JSON string</span></span>
+  });
+
+  <span class="cm">// Update user totals with WEIGHTED scoring formula:</span>
+<span class="hl">  <span class="kw">await</span> prisma.user.<span class="fn">update</span>({
+    data: {
+      totalScore: { increment: score * <span class="num">10</span> *
+        (difficulty === <span class="str">'hard'</span> ? <span class="num">2</span> : difficulty === <span class="str">'medium'</span> ? <span class="num">1.5</span> : <span class="num">1</span>) },
+      quizzesTaken: { increment: <span class="num">1</span> }
+    }
+  });</span>
+  <span class="cm">// Hard: score×10×2 | Medium: score×10×1.5 | Easy: score×10×1</span>
+}</pre>
+  </div>
+</div>
+
+<!-- ════════════════ AUTH + DATABASE ════════════════ -->
+<div class="page">
+  <div class="concept-header">
+    <div class="concept-number n3">🔑</div>
+    <div class="concept-title">
+      <h2>Auth + Database — NextAuth & Prisma</h2>
+      <div class="tagline">How login sessions work and how data is stored persistently</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/lib/nextauth.ts — JWT Callback Chain</span><span class="badge">AUTH CONFIG</span></div>
+    <pre><span class="cm">// When Google user signs in: auto-create them in our DB</span>
+<span class="kw">async</span> <span class="fn">signIn</span>({ user, account }) {
+  <span class="kw">if</span> (account?.provider === <span class="str">"google"</span>) {
+    <span class="kw">const</span> existing = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({ where: { email: user.email } });
+    <span class="kw">if</span> (!existing) <span class="kw">await</span> prisma.user.<span class="fn">create</span>({ data: { name, email, password: <span class="str">""</span> } });
+  }
+  <span class="kw">return true</span>;
+},
+
+<span class="cm">// Step 2: Attach our DB user ID to the JWT token</span>
+<span class="hl"><span class="kw">async</span> <span class="fn">jwt</span>({ token, user, account }) {
+  <span class="kw">if</span> (user) token.id = user.id;    <span class="cm">// First login: attach ID</span>
+  <span class="kw">if</span> (account?.provider === <span class="str">"google"</span>) {
+    <span class="kw">const</span> dbUser = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({ where: { email: token.email } });
+    <span class="kw">if</span> (dbUser) token.id = dbUser.id;  <span class="cm">// Google: get our DB ID</span>
+  }
+  <span class="kw">return</span> token;
+},</span>
+
+<span class="cm">// Step 3: Copy ID from token into session so API routes can use it</span>
+<span class="hl"><span class="kw">async</span> <span class="fn">session</span>({ session, token }) {
+  <span class="kw">if</span> (token) (session.user <span class="kw">as any</span>).id = token.id;  <span class="cm">// Now available everywhere</span>
+  <span class="kw">return</span> session;
+}</span></pre>
+  </div>
+
+  <div class="two-col">
+    <div class="code-block">
+      <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">src/lib/prisma.ts — Singleton Pattern</span></div>
+      <pre><span class="cm">// Problem: hot-reload creates new PrismaClient</span>
+<span class="cm">// every time → exhausts DB connection pool</span>
+
+<span class="kw">const</span> globalForPrisma = global <span class="kw">as any</span>;
+
+<span class="hl"><span class="kw">export const</span> prisma =
+  globalForPrisma.prisma || <span class="kw">new</span> <span class="fn">PrismaClient</span>();
+<span class="cm">// Reuse existing if already created</span>
+
+<span class="kw">if</span> (process.env.NODE_ENV !== <span class="str">'production'</span>)
+  globalForPrisma.prisma = prisma;
+<span class="cm">// Store on global so next reload reuses it</span></span></pre>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="filename">prisma/schema.prisma — Database Tables</span></div>
+        <pre><span class="kw">model</span> <span class="cls">User</span> {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?  <span class="cm">// ? = optional</span>
+  password     String   <span class="cm">// bcrypt hash</span>
+  totalScore   Int      @default(0)
+  quizzesTaken Int      @default(0)
+  quizzes      Quiz[]   <span class="cm">// one-to-many</span>
+}
+
+<span class="kw">model</span> <span class="cls">Quiz</span> {
+  id         String @id @default(cuid())
+  userId     String        <span class="cm">// FK → User</span>
+  score      Int
+  total      Int
+  percentage Int
+  mode       String        <span class="cm">// practice|test</span>
+  difficulty String
+<span class="hl">  weakTopics String?       <span class="cm">// JSON string []</span></span>
+  user User @relation(...)
+  <span class="cm">// onDelete:Cascade removes quizzes</span>
+  <span class="cm">// when user is deleted</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <div class="d-label">Complete Request Flow</div>
+USER uploads PDF
+  ↓
+[Browser] pdfjs-dist extracts text (client-side — avoids 4.5MB server limit)
+  ↓
+[Browser] POST /api/generate  { text, count, difficulty }
+  ↓
+[Next.js Server] getServerSession() → verify JWT cookie → auth check
+  ↓
+[Next.js Server] Build prompt → call Google Gemini 2.5 Flash API
+  ↓
+[Gemini] Returns JSON array of questions
+  ↓
+[Next.js Server] Strip markdown ```json wrappers → JSON.parse → return to browser
+  ↓
+[Browser] setQuestions(data.questions) → React re-renders → quiz appears
+  ↓
+USER answers all questions → clicks Submit
+  ↓
+[Browser] calculateScore() + extractWeakTopics() → POST /api/results
+  ↓
+[Next.js Server] prisma.quiz.create() + prisma.user.update(totalScore)
+  ↓
+[Neon PostgreSQL Cloud DB] Data saved permanently
+  ↓
+[Browser] ResultScreen shown with score, percentage, weak topic tags
+  </div>
+</div>
+
+<!-- ════════════════ FRONTEND SUMMARY ════════════════ -->
+<div class="summary-page">
+  <div class="summary-header">
+    <h2>Frontend Summary — Every File at a Glance</h2>
+    <p>Quick reference for the entire Next.js application</p>
+  </div>
+
+  <table class="summary-table">
+    <tr><th>File</th><th>Type</th><th>URL / Role</th><th>Key Feature</th></tr>
+    <tr><td><code>layout.tsx</code></td><td>Server</td><td>Wraps all pages</td><td>Loads Inter font, renders TopNav once, sets dark background</td></tr>
+    <tr><td><code>page.tsx</code></td><td>Server</td><td><code>/</code></td><td>Checks session server-side; button routes to /dashboard or /login accordingly</td></tr>
+    <tr><td><code>login/page.tsx</code></td><td>Client</td><td><code>/login</code></td><td>Google OAuth + email/password; <code>redirect:false</code> allows custom error handling</td></tr>
+    <tr><td><code>forge/page.tsx</code></td><td>Client</td><td><code>/forge</code></td><td>All state in one place; PDF parsed browser-side; 3 UI states; fire-and-forget DB save</td></tr>
+    <tr><td><code>dashboard/page.tsx</code></td><td>Server</td><td><code>/dashboard</code></td><td>Direct DB query; <code>flatMap+reduce</code> algorithm computes top 5 weak topics</td></tr>
+    <tr><td><code>leaderboard/page.tsx</code></td><td>Server</td><td><code>/leaderboard</code></td><td><code>force-dynamic</code> ensures scores are always live, never cached</td></tr>
+    <tr><td><code>TopNav.tsx</code></td><td>Server</td><td>All pages</td><td>Desktop inline links; mobile = fixed bottom navigation bar via Tailwind <code>md:</code> breakpoints</td></tr>
+    <tr><td><code>LogoutButton.tsx</code></td><td>Client</td><td>TopNav</td><td>Isolated client component so <code>signOut()</code> can be used inside server component TopNav</td></tr>
+    <tr><td><code>UploadBox.tsx</code></td><td>Client</td><td>Forge page</td><td>Drag-and-drop + click; hidden <code>&lt;input&gt;</code> triggered programmatically via <code>useRef</code></td></tr>
+    <tr><td><code>QuizCard.tsx</code></td><td>Client</td><td>Forge page</td><td>Practice shows answer immediately; test mode locks until <code>showCorrections=true</code></td></tr>
+    <tr><td><code>ResultScreen.tsx</code></td><td>Client</td><td>Forge page</td><td>Spring-animated progress bar; dynamic motivational message based on percentage</td></tr>
+    <tr><td><code>Timer.tsx</code></td><td>Client</td><td>Forge page</td><td><code>useEffect</code> + <code>setInterval</code>; cleanup prevents memory leaks; red pulse under 60s</td></tr>
+    <tr><td><code>api/generate/route.ts</code></td><td>Server API</td><td><code>POST /api/generate</code></td><td>Auth guard; calls Gemini 2.5 Flash; strips markdown; returns parsed JSON questions</td></tr>
+    <tr><td><code>api/results/route.ts</code></td><td>Server API</td><td><code>POST /api/results</code></td><td>Creates Quiz record; updates User.totalScore with difficulty multiplier (1×/1.5×/2×)</td></tr>
+    <tr><td><code>lib/nextauth.ts</code></td><td>Server Lib</td><td>Auth config</td><td>Google + Credentials providers; 3-callback chain attaches DB user.id to session</td></tr>
+    <tr><td><code>lib/prisma.ts</code></td><td>Server Lib</td><td>DB client</td><td>Singleton pattern stores PrismaClient on <code>global</code> to survive hot-reload</td></tr>
+    <tr><td><code>schema.prisma</code></td><td>DB Schema</td><td>Neon PostgreSQL</td><td>User + Quiz tables; cuid() IDs; onDelete:Cascade; weakTopics as JSON string</td></tr>
+  </table>
+
+  <div style="margin-top:30px;background:linear-gradient(135deg,#0f0c29,#302b63);border-radius:16px;padding:28px;text-align:center;">
+    <p style="color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">One-Line System Summary</p>
+    <p style="color:#fff;font-size:15px;font-weight:600;line-height:1.8;max-width:750px;margin:0 auto;">"The <span style="color:#4facfe">Next.js frontend</span> extracts PDF text in the browser, sends it to an <span style="color:#f093fb">auth-guarded API route</span> that calls <span style="color:#43e97b">Google Gemini</span> with a strict JSON prompt, returns quiz questions to the browser, and upon completion saves the score to <span style="color:#ffa657">Neon PostgreSQL</span> via Prisma with a difficulty-weighted formula — all secured by <span style="color:#a5d6ff">NextAuth JWT sessions</span>."</p>
+  </div>
+</div>
+
+</body>
+</html>

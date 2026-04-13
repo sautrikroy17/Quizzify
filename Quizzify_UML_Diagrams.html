@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizzify UML Diagrams</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 0; padding: 40px; color: #333; background: #fff; }
+    h1 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 40px; }
+    h2 { color: #34495e; margin-top: 50px; font-size: 24px; padding-bottom: 5px; border-bottom: 1px solid #eee; page-break-before: always; }
+    h2:first-of-type { page-break-before: avoid; margin-top: 20px; }
+    .mermaid { text-align: center; margin: 20px 0; padding: 20px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #eaeaea; }
+    p { text-align: center; color: #7f8c8d; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>Quizzify AI - UML Diagrams</h1>
+
+  <h2>1. Mocked Use Case Diagram</h2>
+  <p>Shows the primary actors and their interactions with the Quizzify system.</p>
+  <div class="mermaid">
+    flowchart LR
+      U(("User\n(Student/Teacher)"))
+      A(("Admin"))
+      
+      subgraph Quizzify Application
+        UC1([Sign In / Sign Up])
+        UC2([Upload Document])
+        UC3([Set Assessment Properties])
+        UC4([Forge Quiz])
+        UC5([Take Assessment / Practice])
+        UC6([View Results])
+        UC7([View Leaderboard])
+        
+        UC8([Manage Users])
+        UC9([Manage Quiz Stats])
+      end
+      
+      U --> UC1
+      U --> UC2
+      U --> UC3
+      U --> UC4
+      U --> UC5
+      U --> UC6
+      U --> UC7
+      
+      A --> UC1
+      A --> UC8
+      A --> UC9
+      A --> UC7
+      
+      classDef actor fill:#f9f9f9,stroke:#333,stroke-width:2px;
+      classDef usecase fill:#d4e6f1,stroke:#2980b9,stroke-width:2px,border-radius:10px;
+      class U,A actor;
+      class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9 usecase;
+  </div>
+
+  <h2>2. System Architecture (Component Diagram)</h2>
+  <p>Illustrates the high-level architecture and components of Quizzify.</p>
+  <div class="mermaid">
+    graph TD;
+      Client[Client Browser (React/Next.js)]
+      NextAuth[NextAuth.js Authentication]
+      RouteGenerate[Generate API Route]
+      RouteResults[Results API Route]
+      MongoDB[(MongoDB Database)]
+      Prisma[Prisma ORM]
+      Gemini[Google Generative AI - Gemini Flash]
+      
+      Client -->|Auth Request| NextAuth
+      Client -->|POST /api/generate| RouteGenerate
+      Client -->|POST /api/results| RouteResults
+      
+      NextAuth -->|Query/Mutate| Prisma
+      RouteGenerate -->|Extract text & Prompt| Gemini
+      RouteResults -->|Save Stats & Scores| Prisma
+      
+      Prisma -->|Read/Write Data| MongoDB
+      Gemini -.->|Return JSON Questions| RouteGenerate
+  </div>
+
+  <h2>3. Sequence Diagram: Forging a Quiz</h2>
+  <p>Details the flow of events when a user uploads a document to generate a quiz.</p>
+  <div class="mermaid">
+    sequenceDiagram
+      actor User
+      participant Frontend as Forge Page (Client)
+      participant NextAuth as NextAuth
+      participant Backend as Next.js API (/api/generate)
+      participant Gemini as Google Generative AI
+      
+      User->>Frontend: Selects PDF/PPTX and clicks Forge Quiz
+      Frontend->>Frontend: Extracts text from local file
+      Frontend->>NextAuth: Checks Authentication Session
+      NextAuth-->>Frontend: Valid Session
+      Frontend->>Backend: POST /api/generate (Text, Count, Difficulty)
+      Backend->>Gemini: model.generateContent() with extracted text
+      Gemini-->>Backend: Return Generated Quiz JSON
+      Backend-->>Frontend: Send parsed questions array
+      Frontend-->>User: Render Quiz Interactive View
+  </div>
+
+  <h2>4. Class Diagram (Data Models)</h2>
+  <p>Represents the core data models and relationships in the database.</p>
+  <div class="mermaid">
+    classDiagram
+      class User {
+        +String id
+        +String name
+        +String email
+        +String image
+        +DateTime createdAt
+      }
+      
+      class Account {
+        +String id
+        +String userId
+        +String type
+        +String provider
+      }
+      
+      class QuizResult {
+        +String id
+        +String userId
+        +Int score
+        +Int total
+        +String mode
+        +String difficulty
+        +String[] weakTopics
+        +DateTime createdAt
+      }
+      
+      User "1" *-- "many" Account : has
+      User "1" *-- "many" QuizResult : takes
+  </div>
+
+  <h2>5. Activity Diagram: Answering Questions</h2>
+  <p>Shows the logical flow of a user attempting an active assessment.</p>
+  <div class="mermaid">
+    stateDiagram-v2
+      [*] --> StartQuiz
+      StartQuiz --> ViewQuestion : Load Question 1
+      ViewQuestion --> SelectAnswer : User clicks option
+      SelectAnswer --> StateCheck
+      StateCheck --> ViewQuestion : Has more questions
+      StateCheck --> SubmitAssessment : All answered / Timer Ends
+      SubmitAssessment --> CalculateScore
+      CalculateScore --> SaveToDatabase
+      SaveToDatabase --> ViewResults
+      ViewResults --> [*]
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</body>
+</html>

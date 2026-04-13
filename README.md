@@ -135,7 +135,7 @@ Navigate to `http://localhost:3000` to interact with the application locally.
 
 <div align="center">
 
-**© 2024 Sautrik Roy — Manipal Institute of Technology Sciences (MITS)**
+**© 2026 Sautrik Roy — Licensed under the [MIT License](LICENSE)**
 
 *Built for academic and competitive showcase. Any resemblance to production-grade engineering is entirely intentional.*
 
