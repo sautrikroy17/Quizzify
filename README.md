@@ -130,3 +130,13 @@ Navigate to `http://localhost:3000` to interact with the application locally.
 3. Password is bcrypt-hashed (10 rounds) before storage
 4. NextAuth issues a signed JWT session
 5. Protected routes (`/dashboard`, `/forge`, `/leaderboard`) check session server-side
+
+---
+
+<div align="center">
+
+**© 2024 Sautrik Roy — Manipal Institute of Technology Sciences (MITS)**
+
+*Built for academic and competitive showcase. Any resemblance to production-grade engineering is entirely intentional.*
+
+</div>
