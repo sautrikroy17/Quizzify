@@ -46,8 +46,13 @@ Do not include any formatting, markdown wrappers, or extra text. ONLY return the
 --- Source Text ---
 ${extractedText.slice(0, 30000)}`;
 
-    // Fallback model chain — tries each until one succeeds
-    const modelChain = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.0-pro"];
+    // Fallback model chain using currently available models on the Gemini API
+    const modelChain = [
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-2.0-flash-exp",
+    ];
+
     let lastError: any = null;
 
     for (const modelName of modelChain) {
@@ -61,13 +66,14 @@ ${extractedText.slice(0, 30000)}`;
         const questions = JSON.parse(cleanedText);
         return NextResponse.json({ questions });
       } catch (err: any) {
-        // If quota/rate-limit/unavailable, try next model
         const isTransientError =
           err?.message?.includes("429") ||
           err?.message?.includes("503") ||
           err?.message?.includes("quota") ||
           err?.message?.includes("Too Many Requests") ||
-          err?.message?.includes("Service Unavailable");
+          err?.message?.includes("Service Unavailable") ||
+          err?.message?.includes("404") ||
+          err?.message?.includes("not found");
         if (isTransientError) {
           console.warn(`Model ${modelName} unavailable, trying next fallback...`);
           lastError = err;
@@ -77,7 +83,6 @@ ${extractedText.slice(0, 30000)}`;
       }
     }
 
-    // All models exhausted
     console.error("All models exhausted:", lastError?.message);
     return NextResponse.json(
       { error: "All AI models are currently busy. Please try again in a moment." },
