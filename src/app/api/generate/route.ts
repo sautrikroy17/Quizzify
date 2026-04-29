@@ -23,7 +23,6 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error("GEMINI_API_KEY environment variable is missing.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const difficultyInstruction = difficulty === "mixed"
       ? "a MIXED difficulty level (e.g., approximately 30% easy, 40% medium, 30% hard)"
@@ -47,15 +46,43 @@ Do not include any formatting, markdown wrappers, or extra text. ONLY return the
 --- Source Text ---
 ${extractedText.slice(0, 30000)}`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }]
-    });
-    const responseText = result.response.text();
+    // Fallback model chain — tries each until one succeeds
+    const modelChain = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.0-pro"];
+    let lastError: any = null;
 
-    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-    const questions = JSON.parse(cleanedText);
+    for (const modelName of modelChain) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }]
+        });
+        const responseText = result.response.text();
+        const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const questions = JSON.parse(cleanedText);
+        return NextResponse.json({ questions });
+      } catch (err: any) {
+        // If quota/rate-limit/unavailable, try next model
+        const isTransientError =
+          err?.message?.includes("429") ||
+          err?.message?.includes("503") ||
+          err?.message?.includes("quota") ||
+          err?.message?.includes("Too Many Requests") ||
+          err?.message?.includes("Service Unavailable");
+        if (isTransientError) {
+          console.warn(`Model ${modelName} unavailable, trying next fallback...`);
+          lastError = err;
+          continue;
+        }
+        throw err;
+      }
+    }
 
-    return NextResponse.json({ questions });
+    // All models exhausted
+    console.error("All models exhausted:", lastError?.message);
+    return NextResponse.json(
+      { error: "All AI models are currently busy. Please try again in a moment." },
+      { status: 429 }
+    );
   } catch (error: any) {
     console.error("API Pipeline Error:", error);
     return NextResponse.json(
