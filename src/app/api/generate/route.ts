@@ -37,6 +37,21 @@ Do not include any formatting, markdown wrappers, or extra text. ONLY return the
 ${text.slice(0, 30000)}`;
 }
 
+// Robustly extract JSON array from AI response — handles preamble text, code fences, etc.
+function extractJsonArray(raw: string): any[] {
+  // 1. Strip code fences
+  let cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+
+  // 2. Try to find a JSON array anywhere in the response (most reliable)
+  const arrayMatch = cleaned.match(/(\[[\s\S]*\])/);
+  if (arrayMatch) {
+    return JSON.parse(arrayMatch[1]);
+  }
+
+  // 3. Last resort: parse as-is
+  return JSON.parse(cleaned);
+}
+
 function isTransientError(err: any): boolean {
   const msg: string = err?.message || "";
   return (
@@ -95,8 +110,7 @@ export async function POST(req: Request) {
             temperature: 0.4,
           });
           const raw = completion.choices[0]?.message?.content || "";
-          const cleaned = raw.replace(/```json/g, "").replace(/```/g, "").trim();
-          const questions = JSON.parse(cleaned);
+          const questions = extractJsonArray(raw);
           console.log(`✅ Served by Groq / ${modelName}`);
           return NextResponse.json({ questions });
         } catch (err: any) {
@@ -123,8 +137,7 @@ export async function POST(req: Request) {
             contents: [{ role: "user", parts: [{ text: prompt }] }],
           });
           const raw = result.response.text();
-          const cleaned = raw.replace(/```json/g, "").replace(/```/g, "").trim();
-          const questions = JSON.parse(cleaned);
+          const questions = extractJsonArray(raw);
           console.log(`✅ Served by Gemini / ${modelName}`);
           return NextResponse.json({ questions });
         } catch (err: any) {

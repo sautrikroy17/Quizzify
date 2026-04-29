@@ -81,31 +81,49 @@ export default function ForgePage() {
 
   // ─── PPTX extraction (browser-side via JSZip) ─────────────────────────────
   // PPTX files are ZIP archives — each slide is an XML file in ppt/slides/
-  // We extract the text content from <a:r><a:t>...</a:t></a:r> elements
+  // We extract the text content from <a:t>...</a:t> elements and decode XML entities
   const extractTextFromPptx = async (file: File): Promise<string> => {
     const JSZip = (await import('jszip')).default;
     const arrayBuffer = await file.arrayBuffer();
     const zip = await JSZip.loadAsync(arrayBuffer);
 
+    // Sort by slide number numerically (slide10 after slide9, not slide1)
     const slideFiles = Object.keys(zip.files)
-      .filter(name => /^ppt\/slides\/slide[0-9]+\.xml$/.test(name))
-      .sort();
+      .filter(name => /^ppt\/slides\/slide[0-9]+\.xml$/i.test(name))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/slide(\d+)/)?.[1] || '0');
+        const numB = parseInt(b.match(/slide(\d+)/)?.[1] || '0');
+        return numA - numB;
+      });
+
+    const decodeXmlEntities = (str: string) =>
+      str
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)))
+        .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 
     let fullText = "";
     for (const slideName of slideFiles) {
       const xmlContent = await zip.files[slideName].async('string');
       // Extract text from <a:t>...</a:t> XML tags
-      const matches = xmlContent.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
+      const matches = xmlContent.match(/<a:t[^>]*>([^<]*)<\/a:t>/g) || [];
       const slideText = matches
-        .map(m => m.replace(/<[^>]+>/g, ''))
+        .map(m => decodeXmlEntities(m.replace(/<[^>]+>/g, '').trim()))
+        .filter(Boolean)
         .join(' ');
-      fullText += slideText + "\n";
+      if (slideText) fullText += slideText + "\n";
     }
 
     if (!fullText.trim()) {
       throw new Error("Could not extract text from the PowerPoint. Make sure the file contains readable text (not just images).");
     }
-    return fullText;
+
+    // Strip control characters (except newline/tab) that confuse AI models
+    return fullText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ').replace(/  +/g, ' ');
   };
 
   const handleGenerate = async () => {
@@ -132,8 +150,11 @@ export default function ForgePage() {
 
       if (!extractedText.trim()) throw new Error("Could not extract any text from the document.");
 
-      // Truncate to save payload size (Gemini won't read past a certain token limit anyway)
-      const sanitizedText = extractedText.slice(0, 150000); 
+      // Strip control characters and truncate
+      const sanitizedText = extractedText
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ')
+        .replace(/  +/g, ' ')
+        .slice(0, 30000);
 
       const formData = new FormData();
       formData.append("text", sanitizedText);
