@@ -1,0 +1,32 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#e8f4f8", "primaryTextColor": "#1a1a2e", "primaryBorderColor": "#4facfe", "lineColor": "#4facfe", "secondaryColor": "#d0ecf8", "fontFamily": "Segoe UI", "fontSize": "15px"}}}%%
+classDiagram
+  direction LR
+  class User {
+    +String id
+    +String name
+    +String email
+    +String image
+    +DateTime createdAt
+    +getProfile() Object
+  }
+  class Account {
+    +String id
+    +String userId
+    +String type
+    +String provider
+    +String providerAccountId
+    +link() void
+  }
+  class QuizResult {
+    +String id
+    +String userId
+    +Int score
+    +Int total
+    +String mode
+    +String difficulty
+    +String[] weakTopics
+    +DateTime createdAt
+    +getPercentage() Float
+  }
+  User "1" *-- "many" Account : has
+  User "1" *-- "many" QuizResult : takes

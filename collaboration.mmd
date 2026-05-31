@@ -1,0 +1,16 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#e8f4f8", "primaryTextColor": "#1a1a2e", "primaryBorderColor": "#4facfe", "lineColor": "#4facfe", "secondaryColor": "#d0ecf8", "fontFamily": "Segoe UI", "fontSize": "15px"}}}%%
+flowchart LR
+    U(["User"])
+    FE["Frontend\nForge Page"]
+    NA["NextAuth\nAuth Service"]
+    BE["Backend\nAPI Server"]
+    AI["Gemini AI\nGenerator"]
+
+    U -- "1: Upload file" --> FE
+    FE -- "2: Check auth" --> NA
+    NA -- "3: Session valid" --> FE
+    FE -- "4: POST /api/generate" --> BE
+    BE -- "5: Generate quiz" --> AI
+    AI -- "6: Return JSON" --> BE
+    BE -- "7: Quiz array" --> FE
+    FE -- "8: Show quiz" --> U

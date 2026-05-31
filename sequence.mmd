@@ -1,0 +1,17 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#e8f4f8", "primaryTextColor": "#1a1a2e", "primaryBorderColor": "#4facfe", "lineColor": "#4facfe", "secondaryColor": "#d0ecf8", "fontFamily": "Segoe UI", "fontSize": "15px", "actorBkg": "#d0ecf8", "actorTextColor": "#1a1a2e", "actorLineColor": "#4facfe", "signalColor": "#4facfe", "signalTextColor": "#1a1a2e", "labelBoxBkgColor": "#e8f4f8", "labelTextColor": "#1a1a2e", "loopTextColor": "#1a1a2e", "noteBorderColor": "#4facfe", "noteBkgColor": "#e8f4f8", "noteTextColor": "#1a1a2e", "activationBorderColor": "#4facfe", "activationBkgColor": "#d0ecf8"}}}%%
+sequenceDiagram
+  actor User as User
+  participant FE as Forge Page
+  participant NA as NextAuth
+  participant BE as Next.js API
+  participant AI as Gemini AI
+
+  User->>FE: Upload PDF / PPTX
+  FE->>FE: Extract text locally
+  FE->>NA: Verify session token
+  NA-->>FE: Valid session
+  FE->>BE: POST /api/generate
+  BE->>AI: generateContent(prompt)
+  AI-->>BE: Return JSON questions
+  BE-->>FE: Send parsed quiz array
+  FE-->>User: Render interactive quiz

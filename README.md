@@ -14,9 +14,13 @@
 </div>
 <br/>
 
+![Quizzify Interface](Landing%20page.jpeg)
+
 🌍 **Live Production URL:** [https://quizzify-ai.vercel.app](https://quizzify-ai.vercel.app)
 
 ---
+
+## 📖 Overview
 
 ## 📁 Repository Structure
 

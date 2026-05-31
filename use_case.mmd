@@ -1,0 +1,20 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#e8f4f8", "primaryTextColor": "#1a1a2e", "primaryBorderColor": "#4facfe", "lineColor": "#4facfe", "secondaryColor": "#d0ecf8", "fontFamily": "Segoe UI", "fontSize": "15px"}}}%%
+flowchart TD
+  U(("User"))
+  A(("Admin"))
+
+  subgraph Quizzify["    Quizzify System    "]
+    direction LR
+    UC1(["Sign In / Sign Up"])
+    UC2(["Upload Document"])
+    UC3(["Set Properties"])
+    UC4(["Forge Quiz via AI"])
+    UC5(["Take Assessment"])
+    UC6(["View Results"])
+    UC7(["View Leaderboard"])
+    UC8(["Manage Users"])
+    UC9(["Manage Quiz Stats"])
+  end
+
+  U --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
+  A --> UC1 & UC8 & UC9 & UC7

@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -76,8 +77,8 @@ export default function LoginPage() {
         </Link>
 
         <div className="flex justify-center mb-6 mt-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-brand flex items-center justify-center shadow-[0_0_30px_rgba(79,172,254,0.4)]">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,172,254,0.4)] overflow-hidden">
+            <Image src="/logo.png" alt="Quizzify Logo" width={64} height={64} className="object-cover" />
           </div>
         </div>
 
