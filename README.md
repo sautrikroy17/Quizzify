@@ -1,9 +1,14 @@
-# Quizzify AI
-
-<br/>
 <div align="center">
+  <h1>🧠 Quizzify AI</h1>
   <b>The fastest way to master any subject.</b><br/>
   Transform any PDF into an interactive, competitive assessment in seconds using Gemini AI.
+  
+  <br/><br/>
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Gemini AI](https://img.shields.io/badge/Google_Gemini-1.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
+  [![C++ Backend](https://img.shields.io/badge/C++-Engine-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)]()
+  [![GSSoC'26](https://img.shields.io/badge/GSSoC'26-Open_Source-orange?style=for-the-badge&logo=girlscript)](https://gssoc.girlscript.tech/)
 </div>
 <br/>
 
@@ -88,6 +93,18 @@ g++ -std=c++17 -o backend/QuizzifyCore backend/QuizzifyCore.cpp
 | **PDF Parsing** | `pdfjs-dist` v3 (browser-side, Safari compatible) |
 | **Backend OOP Demo** | C++17 (see `/backend`) |
 | **Deployment** | Vercel (auto-deploy from GitHub `main`) |
+
+---
+
+## 🤝 Contributing (GSSoC Welcome!)
+
+We encourage contributions from the open-source community, particularly from **GirlScript Summer of Code (GSSoC)** participants! 
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/NewFeature`)
+3. Commit your Changes (`git commit -m 'Add NewFeature'`)
+4. Push to the Branch (`git push origin feature/NewFeature`)
+5. Open a Pull Request
 
 ---
 
